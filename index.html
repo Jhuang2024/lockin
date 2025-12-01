@@ -1167,12 +1167,12 @@
             applyTheme: () => {
                 if (app.state.settings.theme === 'dark') {
                     document.documentElement.classList.add('dark');
-                    app.dom.themeIcon.classList.remove('fa-sun');
-                    app.dom.themeIcon.classList.add('fa-moon');
+                    app.dom.themeIcon.classList.remove('fa-moon');
+                    app.dom.themeIcon.classList.add('fa-sun'); // Show sun in dark mode
                 } else {
                     document.documentElement.classList.remove('dark');
-                    app.dom.themeIcon.classList.remove('fa-moon');
-                    app.dom.themeIcon.classList.add('fa-sun');
+                    app.dom.themeIcon.classList.remove('fa-sun');
+                    app.dom.themeIcon.classList.add('fa-moon'); // Show moon in light mode
                 }
             },
 
@@ -2523,14 +2523,18 @@
                     const isCompleted = task.completed;
                     const dueDate = app.helpers.formatDate(task.dueDate);
                     const dueClass = app.helpers.getDueDateClass(task.dueDate, isCompleted);
+                    const categoryClasses = app.helpers.getCategoryTagClasses(task.category);
 
                     return `
-                        <div class="task-item flex items-center bg-brand-lightInput dark:bg-brand-input p-4 rounded-xl ${isCompleted ? 'completed' : ''}" data-id="${task.id}">
+                        <div class="task-item flex items-center bg-brand-lightCard dark:bg-brand-card shadow-md p-4 rounded-xl ${isCompleted ? 'completed' : ''}" data-id="${task.id}">
                             <input type="checkbox" class="task-checkbox priority-${task.priority}" ${isCompleted ? 'checked' : ''} data-action="toggle">
                             <div class="flex-1 min-w-0">
-                                <p class="task-name font-semibold truncate ${app.helpers.getCategoryColor(task.category)}">${task.name}</p>
-                                <span class="task-due text-sm ${dueClass}">${dueDate}</span>
-                                ${task.notes ? `<p class="text-xs text-gray-500 truncate">${task.notes}</p>` : ''}
+                                <p class="task-name font-semibold truncate">${task.name}</p>
+                                <div class="flex items-center gap-x-3 mt-1">
+                                    <span class="task-due text-sm ${dueClass}">${dueDate}</span>
+                                    <span class="text-xs font-medium px-2 py-0.5 rounded-full ${categoryClasses}">${task.category}</span>
+                                </div>
+                                ${task.notes ? `<p class="text-xs text-gray-500 truncate mt-2">${task.notes}</p>` : ''}
                             </div>
                             <div class="flex-shrink-0 ml-4 space-x-2">
                                 <button class="task-action-btn text-gray-400 hover:text-brand-accent" data-action="edit">
@@ -2839,6 +2843,19 @@
                     }
                 },
                 
+                /**
+                 * Get Tailwind classes for a category tag.
+                 */
+                getCategoryTagClasses: (cat) => {
+                    switch (cat) {
+                        case 'School': return 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200';
+                        case 'Life': return 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200';
+                        case 'Application': return 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-200';
+                        case 'Social': return 'bg-pink-100 text-pink-800 dark:bg-pink-900/50 dark:text-pink-200';
+                        default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900/50 dark:text-gray-200';
+                    }
+                },
+
                 /**
                  * Get Tailwind classes for a class/event color.
                  * @param {string} colorName - e.g., 'blue', 'red'
