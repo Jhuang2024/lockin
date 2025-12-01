@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=JetBrains+Mono:wght==400;700&display=swap" rel="stylesheet">
 
     <script>
         tailwind.config = {
@@ -132,6 +132,43 @@
             padding-left: 1rem;
             position: relative;
         }
+
+        /* Weekly View Grid */
+        .weekly-grid {
+            display: grid;
+            grid-template-columns: 80px repeat(7, minmax(100px, 1fr));
+            gap: 1px;
+            overflow-x: auto;
+            max-width: 100%;
+        }
+
+        .weekly-header, .weekly-time, .weekly-cell {
+            padding: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background-color: rgba(24, 24, 27, 0.6);
+            min-width: 100px;
+        }
+
+        .light .weekly-header, .light .weekly-time, .light .weekly-cell {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            background-color: #ffffff;
+        }
+
+        .weekly-time {
+            position: sticky;
+            left: 0;
+            z-index: 20;
+            text-align: right;
+            font-size: 0.75rem;
+            min-width: 80px;
+            padding-right: 12px;
+            background-color: rgba(10, 10, 10, 0.85); /* Heavy glass for sticky */
+        }
+        
+        .light .weekly-time {
+            background-color: rgba(243, 244, 246, 0.95);
+        }
+
     </style>
 </head>
 <body class="h-screen overflow-hidden flex flex-col md:flex-row font-sans">
@@ -211,7 +248,11 @@
     <div id="onboarding-modal" class="fixed inset-0 z-[60] bg-black bg-opacity-90 dark:bg-opacity-90 light:bg-black/50 flex items-center justify-center hidden">
         <div class="glass w-full max-w-lg p-8 rounded-2xl animate-enter mx-4 light:text-gray-900 light:bg-white/90">
             <h2 class="text-3xl font-bold mb-2">Welcome to LOCKIN</h2>
-            <p class="text-gray-400 dark:text-gray-400 light:text-gray-600 mb-6">Let's set up your profile to optimize your schedule.</p>
+            <p class="text-gray-400 dark:text-gray-400 light:text-gray-600 mb-6">
+                Let’s set up your account. After this, you’ll connect your class schedule
+                either by <span class="font-semibold">uploading your calendar</span> or
+                <span class="font-semibold">adding it manually</span>.
+            </p>
             
             <form id="onboarding-form" class="space-y-4">
                 <div>
@@ -227,17 +268,46 @@
                         <option value="12">Grade 12 (Senior)</option>
                     </select>
                 </div>
-                <div>
-                    <label class="block text-sm text-gray-400 dark:text-gray-400 light:text-gray-600 mb-1">Schedule Type</label>
-                    <select id="ob-schedule-type" class="w-full bg-white/5 border border-white/10 dark:bg-white/5 dark:border-white/10 light:bg-gray-100 light:border-gray-300 rounded-lg p-3 text-white dark:text-white light:text-gray-900 focus:outline-none">
-                        <option value="Static">Static (Same classes every day)</option>
-                        <option value="AB">A/B Day Rotation</option>
-                    </select>
-                </div>
-                <button type="submit" class="w-full bg-brand-accent text-white font-bold py-3 rounded-lg hover:bg-violet-600 mt-4">Start Locking In</button>
+                <button type="submit" class="w-full bg-brand-accent text-white font-bold py-3 rounded-lg hover:bg-violet-600 mt-4">Continue</button>
             </form>
         </div>
     </div>
+    
+    <!-- Schedule Input Modal (Step 2 of Onboarding) -->
+    <div id="schedule-setup-modal" class="fixed inset-0 z-[60] bg-black bg-opacity-90 dark:bg-opacity-90 light:bg-black/50 flex items-center justify-center hidden">
+        <div class="glass w-full max-w-lg p-8 rounded-2xl animate-enter mx-4 light:text-gray-900 light:bg-white/90">
+            <h2 class="text-3xl font-bold mb-2">Connect Your Schedule</h2>
+            <p class="text-gray-400 dark:text-gray-400 light:text-gray-600 mb-6">
+                Pull your classes from your calendar, or build your schedule directly inside LOCKIN.
+            </p>
+            
+            <div class="space-y-4">
+                <!-- Hidden file input for calendar upload -->
+                <input type="file" id="calendar-file" accept=".ics,text/calendar" class="hidden" onchange="handleCalendarFile(this.files[0])">
+                
+                <button onclick="triggerCalendarUpload()" class="w-full text-left p-4 rounded-xl border border-white/10 dark:border-white/10 light:border-gray-300 hover:bg-white/5 light:hover:bg-gray-100 transition flex items-center gap-4">
+                    <i class="fa-brands fa-google text-2xl text-red-500"></i>
+                    <div>
+                        <p class="font-bold">Upload Google Calendar (.ics)</p>
+                        <p class="text-sm text-gray-500">
+                            Export your class calendar from Google as an <span class="font-mono">.ics</span> file and upload it here.
+                        </p>
+                    </div>
+                </button>
+                 <button onclick="manualScheduleEntry()" class="w-full text-left p-4 rounded-xl border border-white/10 dark:border-white/10 light:border-gray-300 hover:bg-white/5 light:hover:bg-gray-100 transition flex items-center gap-4">
+                    <i class="fa-solid fa-keyboard text-2xl text-brand-accent"></i>
+                    <div>
+                        <p class="font-bold">Set Up Manually</p>
+                        <p class="text-sm text-gray-500">
+                            Define your time blocks and classes in Settings. Good if your school uses a custom rotation.
+                        </p>
+                    </div>
+                </button>
+            </div>
+            
+        </div>
+    </div>
+
 
     <!-- Add Item Modal -->
     <div id="add-modal" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm flex items-end md:items-center justify-center hidden" onclick="if(event.target === this) closeAddModal()">
@@ -262,7 +332,7 @@
 
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="text-xs text-gray-500 uppercase">Category</label>
+                            <label class="text-xs text-gray-500 uppercase">Category / Type</label>
                             <select id="add-category" class="w-full bg-white/5 border border-white/10 dark:bg-white/5 dark:border-white/10 light:bg-gray-100 light:border-gray-300 rounded-lg p-2 text-sm text-white dark:text-white light:text-gray-900 mt-1">
                                 <option value="School">School</option>
                                 <option value="Life">Life</option>
@@ -281,7 +351,7 @@
                          <input type="time" id="add-time" class="w-full bg-white/5 border border-white/10 dark:bg-white/5 dark:border-white/10 light:bg-gray-100 light:border-gray-300 rounded-lg p-2 text-sm text-white dark:text-white light:text-gray-900 mt-1">
                     </div>
 
-                    <div class="flex gap-2 pt-2">
+                    <div class="flex gap-2 pt-2" id="priority-options">
                         <span class="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded border border-red-500/30 cursor-pointer" onclick="setPriority('Critical')">Critical</span>
                         <span class="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded border border-yellow-500/30 cursor-pointer" onclick="setPriority('Medium')">Medium</span>
                         <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded border border-blue-500/30 cursor-pointer" onclick="setPriority('Low')">Low</span>
@@ -300,13 +370,20 @@
     <!-- JAVASCRIPT LOGIC -->
     <script>
         // --- STATE MANAGEMENT ---
-        const STORE_KEY = 'lockin_app_data_v2';
+        const STORE_KEY = 'lockin_app_data_v3';
         
         let store = {
             theme: 'dark', // 'dark' or 'light'
             user: null, // { name, grade, scheduleType }
-            tasks: [], // { id, title, category, date, priority, completed }
-            events: [], // { id, title, type, date, time }
+            tasks: [
+                 { id: 1, title: "Finish AP History Reading", category: "School", date: new Date(Date.now() + 86400000).toISOString().split('T')[0], priority: "Critical", completed: false },
+                 { id: 2, title: "Apply for Summer Internship", category: "Application", date: new Date(Date.now() + (3 * 86400000)).toISOString().split('T')[0], priority: "Medium", completed: false },
+                 { id: 3, title: "Buy Birthday Card for Mom", category: "Life", date: new Date(Date.now() + (5 * 86400000)).toISOString().split('T')[0], priority: "Low", completed: false },
+            ],
+            events: [
+                { id: 201, title: "Team Meeting", type: "Social", date: new Date().toISOString().split('T')[0], time: '17:00' },
+                { id: 202, title: "Math Tutoring", type: "School", date: new Date().toISOString().split('T')[0], time: '18:30' },
+            ],
             habits: [
                 { id: 1, title: "Sleep before 12", completedToday: false },
                 { id: 2, title: "Drink Water", completedToday: false },
@@ -314,15 +391,15 @@
             ],
             focusLog: 0, // minutes
             schedule: {
-                dayType: 'A', // Current rotating day, default A
+                dayType: 'Static', // 'Static' or starting day of AB rotation
                 classes: [
-                    // Example default classes (user customizes in settings)
+                    // Default / Example Schedule (cleared on first onboarding)
                     { id: 101, name: "AP English", color: "blue", blocks: ["A1"] },
                     { id: 102, name: "AP US History", color: "yellow", blocks: ["B1"] },
                     { id: 103, name: "Calculus", color: "red", blocks: ["A2", "B2"] },
                     { id: 104, name: "Physics", color: "green", blocks: ["A3"] },
                 ],
-                blockMap: { // Defines which time slots map to which block codes (A1, B2, etc.)
+                blockMap: { 
                     'A1': { start: '08:30', end: '09:45' },
                     'B1': { start: '09:50', end: '11:05' },
                     'A2': { start: '11:10', end: '12:25' },
@@ -340,10 +417,9 @@
             const data = localStorage.getItem(STORE_KEY);
             if (data) {
                 const storedData = JSON.parse(data);
-                // Merge stored data, preserving new keys like 'theme' and default schedule structure if missing
                 store = { ...store, ...storedData };
 
-                // Reset habits if new day (simplified logic)
+                // Reset habits if new day
                 const lastLogin = localStorage.getItem('lockin_last_login');
                 const today = new Date().toDateString();
                 if(lastLogin !== today) {
@@ -352,7 +428,6 @@
                 }
             }
             
-            // Apply Theme
             setTheme(store.theme);
 
             if (!store.user) {
@@ -372,6 +447,9 @@
             store.theme = theme;
             document.documentElement.className = theme;
             saveData();
+            // Re-render current view to apply new theme colors if necessary (e.g., calendar)
+            const activeBtn = document.querySelector('.nav-btn.active');
+            if(activeBtn) router(activeBtn.dataset.target);
         }
 
         function updateSidebar() {
@@ -388,17 +466,26 @@
         }
 
         function router(viewName) {
-            // Update UI Active States
+            // Update UI Active States for Sidebar/Mobile Nav
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 const isActive = btn.dataset.target === viewName;
-                btn.classList.toggle('active', isActive);
-                btn.classList.toggle('text-white', isActive);
-                btn.classList.toggle('text-brand-accent', isActive);
-                btn.classList.toggle('bg-white/5', isActive && store.theme === 'dark' && window.innerWidth >= 768);
-                btn.classList.toggle('light:bg-gray-100', isActive && store.theme === 'light' && window.innerWidth >= 768);
+                const isDesktop = window.innerWidth >= 768;
                 
-                if (window.innerWidth < 768) {
-                    btn.classList.remove('bg-white/5', 'light:bg-gray-100');
+                // Reset classes
+                btn.classList.remove('active', 'text-white', 'text-brand-accent', 'bg-white/5', 'light:bg-gray-100');
+                btn.classList.add('text-gray-400');
+                
+                if (isActive) {
+                    btn.classList.add('active', 'text-brand-accent');
+                    if (isDesktop) {
+                        btn.classList.add('bg-white/5');
+                        if (store.theme === 'light') btn.classList.add('light:bg-gray-100');
+                        btn.classList.remove('text-gray-400');
+                        btn.classList.add('text-white', 'light:text-gray-900');
+                    } else {
+                        btn.classList.remove('text-gray-400');
+                        btn.classList.add('text-brand-accent');
+                    }
                 }
             });
 
@@ -416,23 +503,32 @@
         }
 
         // --- SCHEDULE LOGIC ---
-        function getClassesForDay(dayType) {
+        // Determines the day type (A/B) based on the starting day type and current date difference
+        function getDayTypeForDate(date) {
+            if (!store.user || store.user.scheduleType !== 'AB') return 'Static';
+            
+            const startDate = new Date(); // Simplified: assume start date is today
+            const timeDiff = date.getTime() - startDate.getTime();
+            const dayDiff = Math.floor(timeDiff / (1000 * 3600 * 24));
+            
+            // Alternating days logic: Day 0 is A. Day 1 is B. Day 2 is A.
+            return (dayDiff % 2 === 0) ? store.schedule.dayType : (store.schedule.dayType === 'A' ? 'B' : 'A');
+        }
+
+        function getClassesForDate(date) {
+            const dayType = getDayTypeForDate(date);
             const classes = store.schedule.classes || [];
             const blockMap = store.schedule.blockMap || {};
             
             let scheduleItems = [];
 
-            // 1. Get all blocks defined in the map (e.g., A1, B1, A2, B2)
-            const allBlockKeys = Object.keys(blockMap);
-
-            // 2. Filter classes by the given dayType (A or B)
+            // 1. Add classes for the determined dayType (A or B)
             classes.forEach(cls => {
                 cls.blocks.forEach(blockKey => {
-                    // Check if the block key starts with the required dayType letter
-                    // (e.g., if dayType='A', only include blocks like 'A1', 'A2', 'A3')
-                    const requiredBlockKeyPrefix = store.user.scheduleType === 'AB' ? dayType : '';
+                    const blockPrefix = (store.user && store.user.scheduleType === 'AB') ? blockKey[0] : 'Static';
+                    const isCorrectBlock = (!store.user || store.user.scheduleType === 'Static') || blockPrefix === dayType;
                     
-                    if (blockKey.startsWith(requiredBlockKeyPrefix) || store.user.scheduleType === 'Static') {
+                    if (isCorrectBlock) {
                         const time = blockMap[blockKey];
                         if (time) {
                             scheduleItems.push({
@@ -448,22 +544,22 @@
                 });
             });
 
-            // 3. Add events for today
-            const todayStr = currentCalendarDate.toISOString().split('T')[0];
-            const todayEvents = store.events.filter(e => e.date === todayStr);
+            // 2. Add events for this specific date
+            const dateStr = date.toISOString().split('T')[0];
+            const eventsForDate = store.events.filter(e => e.date === dateStr);
 
-            todayEvents.forEach(event => {
+            eventsForDate.forEach(event => {
                 scheduleItems.push({
                     title: event.title,
                     type: event.type,
-                    color: getCategoryColor(event.type).replace('text-', '').replace('-400', ''),
+                    color: getCategoryColor(event.type).replace('text-', '').replace('-400', ''), // Use type color
                     start: event.time || '00:00',
                     end: event.time ? getEndTime(event.time) : '23:59',
                     timeSort: event.time ? event.time.replace(':', '') : '0000'
                 });
             });
 
-            // 4. Sort by start time
+            // 3. Sort by start time
             return scheduleItems.sort((a, b) => (a.timeSort || '0000') - (b.timeSort || '0000'));
         }
 
@@ -481,8 +577,9 @@
         // --- VIEWS ---
 
         function renderDashboard(container) {
+            if (!store.user) return; 
+
             const today = new Date();
-            const todayStr = today.toISOString().split('T')[0];
             const hour = today.getHours();
             let greeting = "Good Morning";
             if (hour >= 12) greeting = "Good Afternoon";
@@ -492,8 +589,8 @@
             const pendingTasks = store.tasks.filter(t => !t.completed).length;
             
             // Dynamic Schedule
-            const dayType = store.schedule.dayType || 'A';
-            const todaysSchedule = getClassesForDay(dayType);
+            const dayType = getDayTypeForDate(today);
+            const todaysSchedule = getClassesForDate(today);
             const classesToday = todaysSchedule.filter(item => item.type === 'Class').length;
             const eventsToday = todaysSchedule.filter(item => item.type !== 'Class').length;
 
@@ -589,8 +686,8 @@
                                         </div>
                                     `).join('') || `
                                          <div class="timeline-item" style="--color: #8b5cf6; --border-color: ${store.theme === 'dark' ? '#050505' : '#f3f4f6'};">
-                                            <p class="text-sm font-bold text-white dark:text-white light:text-gray-900">Break Day or Custom Schedule Needed</p>
-                                            <p class="text-xs text-gray-500 dark:text-gray-500 light:text-gray-600">No defined blocks for Day ${dayType}. Check settings!</p>
+                                            <p class="text-sm font-bold text-white dark:text-white light:text-gray-900">Break Day or Undefined Schedule</p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-500 light:text-gray-600">No classes/events found for today.</p>
                                         </div>
                                     `}
                                 </div>
@@ -617,13 +714,13 @@
         // --- Calendar Views ---
         function renderCalendar(container) {
             container.innerHTML = `
-                <div class="max-w-5xl mx-auto p-6 animate-enter">
-                    <div class="flex justify-between items-center mb-6">
+                <div class="max-w-7xl mx-auto p-6 animate-enter">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                         <h2 class="text-2xl font-bold">Agenda</h2>
-                        <div class="flex glass rounded-xl p-1 text-sm">
-                            <button onclick="setCalendarView('daily')" class="px-3 py-1 rounded-lg font-semibold transition ${currentCalendarView === 'daily' ? 'bg-brand-accent text-white' : 'hover:bg-white/10 dark:text-gray-400 light:text-gray-600'}">Day</button>
-                            <button onclick="setCalendarView('weekly')" class="px-3 py-1 rounded-lg font-semibold transition ${currentCalendarView === 'weekly' ? 'bg-brand-accent text-white' : 'hover:bg-white/10 dark:text-gray-400 light:text-gray-600'}">Week</button>
-                            <button onclick="setCalendarView('monthly')" class="px-3 py-1 rounded-lg font-semibold transition ${currentCalendarView === 'monthly' ? 'bg-brand-accent text-white' : 'hover:bg-white/10 dark:text-gray-400 light:text-gray-600'}">Month</button>
+                        <div class="flex glass rounded-xl p-1 text-sm" id="calendar-view-toggle">
+                            <button id="view-daily" onclick="setCalendarView('daily')" class="px-3 py-1 rounded-lg font-semibold transition hover:bg-white/10 dark:text-gray-400 light:text-gray-600">Day</button>
+                            <button id="view-weekly" onclick="setCalendarView('weekly')" class="px-3 py-1 rounded-lg font-semibold transition hover:bg-white/10 dark:text-gray-400 light:text-gray-600">Week</button>
+                            <button id="view-monthly" onclick="setCalendarView('monthly')" class="px-3 py-1 rounded-lg font-semibold transition hover:bg-white/10 dark:text-gray-400 light:text-gray-600">Month</button>
                         </div>
                     </div>
                     <div id="calendar-view-container">
@@ -638,6 +735,17 @@
             currentCalendarView = view;
             const container = document.getElementById('calendar-view-container');
             if (!container) return;
+            
+            // Update button active state JUST for the three view buttons
+            ['daily','weekly','monthly'].forEach(v => {
+                const btn = document.getElementById(`view-${v}`);
+                if (!btn) return;
+                btn.classList.remove('bg-brand-accent', 'text-white');
+            });
+            const activeBtn = document.getElementById(`view-${view}`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-brand-accent', 'text-white');
+            }
 
             // Clear previous view
             container.innerHTML = '';
@@ -651,8 +759,8 @@
         }
         
         function renderDailyView(container) {
-             const dayType = store.schedule.dayType || 'A';
-             const todaysSchedule = getClassesForDay(dayType);
+             const dayType = getDayTypeForDate(currentCalendarDate);
+             const todaysSchedule = getClassesForDate(currentCalendarDate);
              
              container.innerHTML = `
                 <div class="glass p-6 rounded-2xl">
@@ -682,14 +790,83 @@
         
         function changeDay(offset) {
             currentCalendarDate.setDate(currentCalendarDate.getDate() + offset);
-            setCalendarView('daily');
+            // After changing date, ensure the view is refreshed
+            setCalendarView('daily'); 
         }
 
         function renderWeeklyView(container) {
-            container.innerHTML = `<div class="glass p-6 rounded-2xl h-[60vh] flex items-center justify-center">
-                                    <h3 class="text-xl font-bold">Weekly View is Under Construction 🚧</h3>
-                                    <p class="text-gray-500 mt-2">Check the Daily View for now!</p>
-                                  </div>`;
+            const date = new Date(currentCalendarDate);
+            // Find the start of the week (Sunday)
+            date.setDate(date.getDate() - date.getDay()); 
+            
+            const days = [];
+            for (let i = 0; i < 7; i++) {
+                days.push(new Date(date));
+                date.setDate(date.getDate() + 1);
+            }
+
+            // Generate hours from 8:00 to 20:00
+            const hours = [];
+            for (let h = 8; h <= 20; h++) {
+                hours.push(String(h).padStart(2, '0') + ':00');
+            }
+
+            let gridContent = `<div class="weekly-grid sticky-header">
+                <div class="weekly-header glass-heavy light:bg-gray-100/95 font-bold text-xs uppercase">Time</div>
+                ${days.map(d => {
+                    const dayType = getDayTypeForDate(d);
+                    const isToday = d.toDateString() === new Date().toDateString();
+                    return `<div class="weekly-header glass-heavy light:bg-gray-100/95 text-center text-sm ${isToday ? 'text-brand-accent font-bold' : 'text-gray-400 dark:text-gray-400 light:text-gray-600'}">
+                        ${d.toLocaleString('default', { weekday: 'short' })}<br>
+                        <span class="text-lg">${d.getDate()}</span>
+                        <span class="text-xs opacity-70 block">${dayType}</span>
+                    </div>`
+                }).join('')}
+            `;
+
+            hours.forEach(hour => {
+                gridContent += `<div class="weekly-time text-gray-400 dark:text-gray-400 light:text-gray-600">${hour.slice(0, 5)}</div>`;
+                days.forEach(day => {
+                    const schedule = getClassesForDate(day);
+                    const itemsAtHour = schedule.filter(item => {
+                        return item.start === hour;
+                    });
+
+                    gridContent += `<div class="weekly-cell text-xs relative overflow-hidden">`;
+                    itemsAtHour.forEach(item => {
+                        const color = getClassColorHex(item.color);
+                        gridContent += `
+                            <div class="p-1 mb-1 rounded-md cursor-pointer border border-white/10 dark:border-white/10 light:border-gray-200" style="background-color: ${color}15; border-left: 3px solid ${color};">
+                                <p class="font-semibold truncate">${item.title}</p>
+                                <p class="text-[10px] text-gray-500">${item.start}-${item.end}</p>
+                            </div>
+                        `;
+                    });
+                    gridContent += `</div>`;
+                });
+            });
+
+            gridContent += `</div>`;
+
+             container.innerHTML = `
+                <div class="glass p-4 rounded-2xl overflow-hidden">
+                    <div class="flex justify-between items-center mb-4 px-2">
+                        <h3 class="text-xl font-bold">${days[0].toLocaleDateString('default', { month: 'short', day: 'numeric' })} - ${days[6].toLocaleDateString('default', { month: 'short', day: 'numeric' })}</h3>
+                        <div class="flex gap-2">
+                            <button onclick="changeWeek(-7)" class="w-8 h-8 rounded bg-white/5 hover:bg-white/10 dark:text-gray-400 light:text-gray-600 flex items-center justify-center"><i class="fa-solid fa-chevron-left"></i></button>
+                            <button onclick="changeWeek(7)" class="w-8 h-8 rounded bg-white/5 hover:bg-white/10 dark:text-gray-400 light:text-gray-600 flex items-center justify-center"><i class="fa-solid fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                    <div class="max-h-[70vh] overflow-y-auto no-scrollbar light:bg-white/90">
+                        ${gridContent}
+                    </div>
+                </div>
+            `;
+        }
+        
+        function changeWeek(offset) {
+            currentCalendarDate.setDate(currentCalendarDate.getDate() + offset);
+            setCalendarView('weekly'); 
         }
 
         function renderMonthlyView(container) {
@@ -708,7 +885,9 @@
             }
             for(let d=1; d<=daysInMonth; d++) {
                 const dayString = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-                const hasEvent = store.events.some(e => e.date === dayString);
+                const checkDate = new Date(dayString);
+                const schedule = getClassesForDate(checkDate);
+                const hasEvent = schedule.length > 0;
                 const hasTask = store.tasks.some(t => t.date === dayString && !t.completed);
                 const isToday = d === new Date().getDate() && month === new Date().getMonth() && year === new Date().getFullYear();
 
@@ -867,13 +1046,13 @@
                 clearInterval(focusTimer);
                 isFocusing = false;
                 btn.innerHTML = '<i class="fa-solid fa-play ml-1"></i>';
-                ring.style.stroke = "#f59e0b"; // Warning color paused
+                if (ring) ring.style.stroke = "#f59e0b"; // Warning color paused
             } else {
                 // Start
                 if(focusTimeLeft <= 0) focusTimeLeft = 25 * 60;
                 isFocusing = true;
                 btn.innerHTML = '<i class="fa-solid fa-pause"></i>';
-                ring.style.stroke = "#8b5cf6";
+                if (ring) ring.style.stroke = "#8b5cf6";
 
                 focusTimer = setInterval(() => {
                     focusTimeLeft--;
@@ -898,8 +1077,10 @@
             isFocusing = false;
             focusTimeLeft = 25 * 60;
             updateTimerDisplay();
-            document.getElementById('timer-btn').innerHTML = '<i class="fa-solid fa-play ml-1"></i>';
-            document.getElementById('timer-ring').style.strokeDashoffset = 754; // Reset offset to full circle
+            const btn = document.getElementById('timer-btn');
+            if (btn) btn.innerHTML = '<i class="fa-solid fa-play ml-1"></i>';
+            const ring = document.getElementById('timer-ring');
+            if (ring) ring.style.strokeDashoffset = 0; // Full circle visible on reset
         }
 
         function updateTimerDisplay() {
@@ -937,28 +1118,74 @@
 
                     <!-- Schedule Configuration -->
                     <div class="glass p-6 rounded-2xl mb-8 light:bg-white/90 light:border-gray-200">
-                        <h3 class="font-bold text-lg mb-4">Schedule Setup (Day ${store.schedule.dayType})</h3>
-                        <p class="text-sm text-gray-500 mb-4">Configure your rotating class schedule.</p>
+                        <h3 class="font-bold text-lg mb-4">Schedule Editor</h3>
+                        <p class="text-sm text-gray-500 mb-4">Configure your rotation and define class blocks.</p>
                         
-                        <div class="mb-4">
-                            <label class="block text-sm font-semibold mb-2">Current Rotating Day</label>
-                            <select id="schedule-day-type" class="w-40 bg-white/5 border border-white/10 dark:bg-white/5 dark:border-white/10 light:bg-gray-100 light:border-gray-300 rounded-lg p-2 text-sm text-white dark:text-white light:text-gray-900" onchange="updateScheduleDay(this.value)">
-                                <option value="A" ${store.schedule.dayType === 'A' ? 'selected' : ''}>A Day</option>
-                                <option value="B" ${store.schedule.dayType === 'B' ? 'selected' : ''}>B Day</option>
-                            </select>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <div>
+                                <label class="block text-sm font-semibold mb-2">Current Rotating Day</label>
+                                <select id="schedule-day-type" class="w-full bg-white/5 border border-white/10 dark:bg-white/5 dark:border-white/10 light:bg-gray-100 light:border-gray-300 rounded-lg p-2 text-sm text-white dark:text-white light:text-gray-900" onchange="updateScheduleDay(this.value)">
+                                    <option value="A" ${store.schedule.dayType === 'A' ? 'selected' : ''}>A Day (Start of Rotation)</option>
+                                    <option value="B" ${store.schedule.dayType === 'B' ? 'selected' : ''}>B Day (Start of Rotation)</option>
+                                    <option value="Static" ${store.schedule.dayType === 'Static' ? 'selected' : ''}>Static / Non-Rotating</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold mb-2">Schedule Type</label>
+                                <select id="schedule-type" class="w-full bg-white/5 border border-white/10 dark:bg-white/5 dark:border-white/10 light:bg-gray-100 light:border-gray-300 rounded-lg p-2 text-sm text-white dark:text-white light:text-gray-900" onchange="updateScheduleType(this.value)">
+                                    <option value="Static" ${!store.user || store.user.scheduleType === 'Static' ? 'selected' : ''}>Static</option>
+                                    <option value="AB" ${store.user && store.user.scheduleType === 'AB' ? 'selected' : ''}>A/B Rotation</option>
+                                </select>
+                            </div>
                         </div>
 
-                        <div id="class-list-container" class="space-y-3">
-                            <p class="text-xs text-gray-500 mb-2 uppercase">Defined Classes</p>
+                        <!-- Block Map Editor -->
+                        <h4 class="font-bold text-md mt-6 mb-3">Time Blocks (e.g., A1, Lunch, B3)</h4>
+                        <div id="block-map-editor" class="space-y-3 p-4 rounded-lg border border-white/10 dark:border-white/10 light:border-gray-200">
+                            ${Object.entries(store.schedule.blockMap).map(([key, time]) => `
+                                <div class="flex items-center gap-3">
+                                    <input type="text" value="${key}" class="w-16 p-2 rounded-lg bg-white/5 dark:bg-white/5 light:bg-gray-100 text-sm font-mono" placeholder="Block" disabled>
+                                    <input type="time" value="${time.start}" onchange="updateBlockTime('${key}', 'start', this.value)" class="flex-1 p-2 rounded-lg bg-white/5 dark:bg-white/5 light:bg-gray-100 text-sm">
+                                    <span class="text-gray-500">-</span>
+                                    <input type="time" value="${time.end}" onchange="updateBlockTime('${key}', 'end', this.value)" class="flex-1 p-2 rounded-lg bg-white/5 dark:bg-white/5 light:bg-gray-100 text-sm">
+                                    <button onclick="removeBlock('${key}')" class="text-red-500/70 hover:text-red-500"><i class="fa-solid fa-trash text-sm"></i></button>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button onclick="addBlockForm()" class="mt-4 w-full py-2 bg-brand-accent/20 text-brand-accent rounded-lg text-sm font-semibold hover:bg-brand-accent/30 transition">Add New Block Slot</button>
+
+                        <!-- Class List Editor -->
+                        <h4 class="font-bold text-md mt-6 mb-3">Defined Classes</h4>
+                        <div id="class-list-container" class="space-y-3 p-4 rounded-lg border border-white/10 dark:border-white/10 light:border-gray-200">
                             ${store.schedule.classes.map(cls => `
-                                <div class="flex items-center gap-3 p-2 rounded-lg border border-white/10 dark:border-white/10 light:border-gray-200" style="border-left: 4px solid ${getClassColorHex(cls.color)};">
-                                    <span class="text-sm font-semibold flex-1">${cls.name}</span>
-                                    <span class="text-xs text-gray-500">Blocks: ${cls.blocks.join(', ')}</span>
-                                    <button onclick="removeClass(${cls.id})" class="text-red-500/70 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>
+                                <div class="p-3 rounded-lg border border-white/10 dark:border-white/10 light:border-gray-200" style="border-left: 4px solid ${getClassColorHex(cls.color)};">
+                                    <div class="flex items-center justify-between mb-1">
+                                         <span class="text-sm font-semibold flex-1">${cls.name}</span>
+                                         <button onclick="editClassBlocks(${cls.id})" class="text-brand-accent/70 hover:text-brand-accent text-xs mr-2"><i class="fa-solid fa-pencil"></i> Edit Blocks</button>
+                                         <button onclick="removeClass(${cls.id})" class="text-red-500/70 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>
+                                    </div>
+                                    <span class="text-xs text-gray-500 dark:text-gray-500 light:text-gray-600">Blocks: ${cls.blocks.join(', ')}</span>
                                 </div>
                             `).join('')}
                         </div>
                         <button onclick="addClassForm()" class="mt-4 w-full py-2 bg-brand-accent/20 text-brand-accent rounded-lg text-sm font-semibold hover:bg-brand-accent/30 transition">Add New Class</button>
+                    </div>
+
+                    <!-- Habit Configuration -->
+                    <div class="glass p-6 rounded-2xl mb-8 light:bg-white/90 light:border-gray-200">
+                        <h3 class="font-bold text-lg mb-4">Daily Habits</h3>
+                        <p class="text-sm text-gray-500 mb-4">Define the small things you want to do every day. These show up on your Dashboard.</p>
+                        <div id="habit-list-editor" class="space-y-3">
+                            ${store.habits.map(habit => `
+                                <div class="flex items-center gap-3">
+                                    <input type="text" value="${habit.title}" class="flex-1 p-2 rounded-lg bg-white/5 dark:bg-white/5 light:bg-gray-100 text-sm" onchange="renameHabit(${habit.id}, this.value)">
+                                    <button onclick="removeHabit(${habit.id})" class="text-red-500/70 hover:text-red-500 text-xs"><i class="fa-solid fa-trash"></i></button>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button onclick="addHabitForm()" class="mt-4 w-full py-2 bg-brand-accent/20 text-brand-accent rounded-lg text-sm font-semibold hover:bg-brand-accent/30 transition">
+                            Add New Habit
+                        </button>
                     </div>
 
                     <!-- Reset Data -->
@@ -974,31 +1201,92 @@
         }
         
         // Settings Actions
+        function updateScheduleType(value) {
+            if (!store.user) return;
+            store.user.scheduleType = value;
+            saveData();
+            router('settings');
+            showMessage("Schedule Type Updated", `The app is now set to ${value} schedule.`, "success");
+        }
+
         function updateScheduleDay(value) {
             store.schedule.dayType = value;
             saveData();
             router('settings'); // Re-render settings to show new day type
         }
 
+        function updateBlockTime(key, field, value) {
+            if (store.schedule.blockMap[key]) {
+                store.schedule.blockMap[key][field] = value;
+                saveData();
+            }
+        }
+
+        function addBlockForm() {
+            const blockKey = prompt("Enter a unique Block Key (e.g., A4, Lunch, Flex):");
+            if (!blockKey || store.schedule.blockMap[blockKey]) {
+                showMessage("Invalid Key", "Block key is required and must be unique.", "danger");
+                return;
+            }
+            const startTime = prompt("Enter Start Time (HH:MM format, e.g., 14:20):");
+            const endTime = prompt("Enter End Time (HH:MM format, e.g., 15:35):");
+
+            if (startTime && endTime) {
+                store.schedule.blockMap[blockKey] = { start: startTime, end: endTime };
+                saveData();
+                router('settings');
+                showMessage("Block Added!", `${blockKey} time slot is now available.`, "success");
+            } else {
+                 showMessage("Error", "Start and End times are required.", "danger");
+            }
+        }
+
+        function removeBlock(key) {
+            if (confirm(`Are you sure you want to remove block ${key}? Classes using this block will be unassigned.`)) {
+                delete store.schedule.blockMap[key];
+                // Also remove this block from all classes
+                store.schedule.classes.forEach(cls => {
+                    cls.blocks = cls.blocks.filter(b => b !== key);
+                });
+                saveData();
+                router('settings');
+                showMessage("Block Removed", `${key} deleted.`, "warning");
+            }
+        }
+
         function addClassForm() {
-            // Simple prompt for the sake of single-file structure and speed
             const name = prompt("Enter Class Name (e.g., AP Calculus):");
             if (!name) return;
-            const blocks = prompt("Enter Class Blocks (e.g., A1, B2, separate by comma):");
-            if (!blocks) return;
-            const color = prompt("Enter Class Color (e.g., blue, red, yellow):");
+            const blocksStr = prompt("Enter Class Blocks (e.g., A1, B2, separate by comma):");
+            const blocks = blocksStr ? blocksStr.split(',').map(b => b.trim()) : [];
+            const color = prompt("Enter Class Color (e.g., blue, red, yellow, green, purple):");
             if (!color) return;
 
             const newClass = {
                 id: Date.now(),
                 name,
                 color,
-                blocks: blocks.split(',').map(b => b.trim().toUpperCase())
+                blocks
             };
             store.schedule.classes.push(newClass);
             saveData();
             router('settings');
             showMessage("Class Added!", `${name} is now on your schedule.`, "success");
+        }
+        
+        function editClassBlocks(id) {
+            const cls = store.schedule.classes.find(c => c.id === id);
+            if (!cls) return;
+            
+            const currentBlocks = cls.blocks.join(', ');
+            const newBlocksStr = prompt(`Editing blocks for ${cls.name}. Enter blocks separated by comma (e.g., A1, B3):`, currentBlocks);
+            
+            if (newBlocksStr !== null) {
+                cls.blocks = newBlocksStr.split(',').map(b => b.trim());
+                saveData();
+                router('settings');
+                showMessage("Class Updated!", `${cls.name} blocks changed.`, "success");
+            }
         }
 
         function removeClass(id) {
@@ -1006,6 +1294,36 @@
             saveData();
             router('settings');
             showMessage("Class Removed", "The class has been deleted.", "warning");
+        }
+
+        // Habit editor actions
+        function addHabitForm() {
+            const title = prompt("New habit (e.g., 'Read 10 pages'):");
+            if (!title) return;
+            const newHabit = {
+                id: Date.now(),
+                title,
+                completedToday: false
+            };
+            store.habits.push(newHabit);
+            saveData();
+            router('settings');
+            showMessage("Habit Added!", `"${title}" has been added.`, "success");
+        }
+
+        function renameHabit(id, newTitle) {
+            const habit = store.habits.find(h => h.id === id);
+            if (!habit) return;
+            habit.title = newTitle || habit.title;
+            saveData();
+        }
+
+        function removeHabit(id) {
+            if (!confirm("Remove this habit?")) return;
+            store.habits = store.habits.filter(h => h.id !== id);
+            saveData();
+            router('settings');
+            showMessage("Habit Removed", "Habit deleted.", "warning");
         }
 
         // --- FOCUS LOGIC ---
@@ -1016,26 +1334,106 @@
             e.preventDefault();
             const name = document.getElementById('ob-name').value;
             const grade = document.getElementById('ob-grade').value;
-            const scheduleType = document.getElementById('ob-schedule-type').value;
 
-            store.user = { name, grade, scheduleType };
-            store.schedule.dayType = scheduleType === 'AB' ? 'A' : 'Static';
+            // Default schedule type to Static; user can change later in Settings
+            store.user = { name, grade, scheduleType: 'Static' };
+            store.schedule.dayType = 'Static';
             
-            // Set initial block map for AB if chosen
-            if (scheduleType === 'AB') {
-                 store.schedule.blockMap = {
-                    'A1': { start: '08:30', end: '09:45' },
-                    'A2': { start: '11:10', end: '12:25' },
-                    'B1': { start: '09:50', end: '11:05' },
-                    'B2': { start: '13:00', end: '14:15' },
-                };
-            }
+            // Clear default/placeholder schedule on first login
+            store.schedule.classes = [];
+            store.schedule.blockMap = {};
             
             saveData();
             document.getElementById('onboarding-modal').classList.add('hidden');
-            updateSidebar();
-            router('dashboard');
+            document.getElementById('schedule-setup-modal').classList.remove('hidden');
         });
+
+        // Calendar import flow (real .ics upload, not just a fake toast)
+        function triggerCalendarUpload() {
+            const fileInput = document.getElementById('calendar-file');
+            if (fileInput) fileInput.click();
+        }
+
+        function handleCalendarFile(file) {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const text = e.target.result;
+                    importICS(text);
+                    document.getElementById('schedule-setup-modal').classList.add('hidden');
+                    saveData();
+                    updateSidebar();
+                    router('calendar');
+                    showMessage("Calendar Imported", "We pulled events from your calendar into your Agenda.", "success");
+                } catch (err) {
+                    console.error(err);
+                    showMessage("Import Failed", "Could not read this calendar file. Make sure it is a valid .ics.", "danger");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // Very simple .ics parser: pulls DTSTART, SUMMARY into store.events
+        function importICS(icsText) {
+            const lines = icsText.split(/\r?\n/);
+            let currentEvent = null;
+            const events = [];
+
+            lines.forEach(line => {
+                if (line.startsWith('BEGIN:VEVENT')) {
+                    currentEvent = {};
+                } else if (line.startsWith('END:VEVENT')) {
+                    if (currentEvent && currentEvent.start && currentEvent.summary) {
+                        const { dateStr, timeStr } = parseICSDate(currentEvent.start);
+                        events.push({
+                            id: Date.now() + Math.floor(Math.random() * 100000),
+                            title: currentEvent.summary,
+                            type: 'School', // default type; user can adjust later if they want
+                            date: dateStr,
+                            time: timeStr
+                        });
+                    }
+                    currentEvent = null;
+                } else if (currentEvent) {
+                    if (line.startsWith('DTSTART')) {
+                        const value = line.split(':')[1];
+                        currentEvent.start = value;
+                    } else if (line.startsWith('SUMMARY')) {
+                        const value = line.split(':').slice(1).join(':'); // in case ':' present in title
+                        currentEvent.summary = value;
+                    }
+                }
+            });
+
+            // Merge into existing events
+            store.events = store.events.concat(events);
+        }
+
+        function parseICSDate(val) {
+            // Handles formats like 20251201T090000Z or 20251201T090000
+            let year = parseInt(val.slice(0,4), 10);
+            let month = parseInt(val.slice(4,6), 10) - 1; // 0-index
+            let day = parseInt(val.slice(6,8), 10);
+            let hour = 0;
+            let minute = 0;
+            if (val.includes('T')) {
+                hour = parseInt(val.slice(9,11) || '0', 10);
+                minute = parseInt(val.slice(11,13) || '0', 10);
+            }
+            const d = new Date(year, month, day, hour, minute);
+            const dateStr = d.toISOString().split('T')[0];
+            const timeStr = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+            return { dateStr, timeStr };
+        }
+
+        function manualScheduleEntry() {
+            document.getElementById('schedule-setup-modal').classList.add('hidden');
+            showMessage("Manual Entry Selected", "Head to Settings to define your time blocks and classes!", "warning");
+            updateSidebar();
+            router('settings');
+        }
+
 
         // Add Modal Logic
         function openAddModal(isEvent = false) {
@@ -1047,33 +1445,33 @@
         function closeAddModal() {
             document.getElementById('add-modal').classList.add('hidden');
             document.getElementById('add-form').reset();
-            // Clear priority visualization
         }
 
         function switchAddTab(type) {
-            // Tab switching logic (left as is)
             const taskTab = document.getElementById('tab-task');
             const eventTab = document.getElementById('tab-event');
             const timeInput = document.getElementById('time-input-container');
             const actionText = document.getElementById('btn-action-text');
             const typeInput = document.getElementById('add-type');
 
+            // Reset active classes on tabs
+            [taskTab, eventTab].forEach(tab => {
+                tab.classList.remove('text-brand-accent', 'border-brand-accent');
+                tab.classList.add('text-gray-400', 'border-transparent');
+            });
+
             if(type === 'task') {
                 taskTab.classList.add('text-brand-accent', 'border-brand-accent');
-                taskTab.classList.remove('text-gray-400', 'border-transparent');
-                eventTab.classList.remove('text-brand-accent', 'border-brand-accent');
-                eventTab.classList.add('text-gray-400', 'border-transparent');
                 timeInput.classList.add('hidden');
                 actionText.textContent = "Task";
                 typeInput.value = "task";
+                document.getElementById('priority-options').classList.remove('hidden');
             } else {
                 eventTab.classList.add('text-brand-accent', 'border-brand-accent');
-                eventTab.classList.remove('text-gray-400', 'border-transparent');
-                taskTab.classList.remove('text-brand-accent', 'border-brand-accent');
-                taskTab.classList.add('text-gray-400', 'border-transparent');
                 timeInput.classList.remove('hidden');
                 actionText.textContent = "Event";
                 typeInput.value = "event";
+                document.getElementById('priority-options').classList.add('hidden');
             }
         }
 
@@ -1083,9 +1481,9 @@
             const title = document.getElementById('add-title').value;
             const category = document.getElementById('add-category').value;
             const date = document.getElementById('add-date').value;
-            const priority = document.getElementById('add-priority').value;
 
             if (type === 'task') {
+                const priority = document.getElementById('add-priority').value;
                 const newTask = {
                     id: Date.now(),
                     title,
@@ -1106,7 +1504,7 @@
                     time
                 };
                 store.events.push(newEvent);
-                showMessage("Event Added!", `"${title}" scheduled for ${time}`, "success");
+                showMessage("Event Added!", `"${title}" scheduled for ${time || 'All day'}`, "success");
             }
 
             saveData();
@@ -1118,6 +1516,12 @@
 
         function setPriority(p) {
             document.getElementById('add-priority').value = p;
+            document.querySelectorAll('#priority-options > span').forEach(el => {
+                el.classList.remove('font-bold', 'border-white');
+                if (el.textContent.trim() === p) {
+                    el.classList.add('font-bold', 'border-white');
+                }
+            });
             showMessage("Priority Set", `New item is ${p} priority.`, "warning");
         }
 
@@ -1149,13 +1553,15 @@
             if(habit) {
                 habit.completedToday = !habit.completedToday;
                 saveData();
-                renderDashboard(document.getElementById('main-container')); // Re-render only dashboard
+                const active = document.querySelector('.nav-btn.active');
+                if (active && active.dataset.target === 'dashboard') {
+                    renderDashboard(document.getElementById('main-container'));
+                }
             }
         }
         
         // Custom Message/Toast Logic (Replaces alert())
         function showMessage(title, message, type) {
-            // A simple placeholder for a toast notification system
             const color = type === 'success' ? 'bg-brand-success' : type === 'warning' ? 'bg-brand-warning' : 'bg-brand-danger';
             
             const toast = document.createElement('div');
@@ -1193,12 +1599,15 @@
                 case 'yellow': return '#f59e0b';
                 case 'green': return '#10b981';
                 case 'purple': return '#a855f7';
+                case 'pink': return '#ec4899';
                 default: return '#6b7280'; // gray
             }
         }
 
         function formatDate(dateStr) {
+            if (!dateStr) return 'No Date';
             const d = new Date(dateStr + 'T00:00:00'); // Adding T00:00:00 to prevent timezone issues
+            if (isNaN(d.getTime())) return dateStr;
             return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
         }
 
