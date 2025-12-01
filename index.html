@@ -187,29 +187,44 @@
         
         /* Task Filter Buttons */
         .task-filter-btn {
+            display: inline-flex;
+            align-items: center;
             padding: 8px 16px;
             border-radius: 8px;
             font-weight: 600;
             background-color: #e5e7eb; /* brand-lightInput */
+            border: 1px solid #d1d5db; /* light mode border */
             transition: all 0.2s ease;
         }
         .task-filter-btn:hover {
             background-color: #f3f4f6; /* brand-lightCardHover */
+            border-color: #9ca3af;
         }
         .task-filter-btn.active {
             background-color: #8b5cf6; /* brand-accent */
             color: white;
+            border-color: #8b5cf6;
+            box-shadow: 0 4px 14px 0 rgba(139, 92, 246, 0.25);
         }
         
         html.dark .task-filter-btn {
             background-color: #27272a; /* brand-input */
+            border: 1px solid #3f3f46; /* dark mode border */
         }
         html.dark .task-filter-btn:hover {
             background-color: #202023; /* brand-cardHover */
+            border-color: #52525b;
         }
         html.dark .task-filter-btn.active {
             background-color: #8b5cf6; /* brand-accent */
             color: white;
+            border-color: #8b5cf6;
+            box-shadow: 0 4px 14px 0 rgba(139, 92, 246, 0.25);
+        }
+
+        /* Subtle border for light mode cards */
+        html:not(.dark) .bg-brand-lightCard {
+            border: 1px solid #e5e7eb; /* brand-lightInput */
         }
     </style>
 </head>
@@ -295,7 +310,7 @@
                 </li>
                 <li>
                     <a href="#" data-view="events" class="nav-link flex items-center py-3 px-3 md:px-4 rounded-lg transition-all group">
-                        <i class="fa-solid fa-calendar-star text-lg w-6 text-center"></i>
+                        <i class="fa-solid fa-star text-lg w-6 text-center"></i>
                         <span class="ml-4 font-semibold hidden md:block">Events</span>
                     </a>
                 </li>
@@ -546,12 +561,12 @@
                 
                 <!-- Task Filters -->
                 <div class="flex flex-wrap gap-2 mb-6">
-                    <button class="task-filter-btn active" data-filter="all">All</button>
-                    <button class="task-filter-btn" data-filter="School">School</button>
-                    <button class="task-filter-btn" data-filter="Life">Life</button>
-                    <button class="task-filter-btn" data-filter="Application">Application</button>
-                    <button class="task-filter-btn" data-filter="Social">Social</button>
-                    <button class="task-filter-btn" data-filter="completed">Completed</button>
+                    <button class="task-filter-btn active" data-filter="all"><i class="fa-solid fa-grip w-4 mr-2"></i>All</button>
+                    <button class="task-filter-btn" data-filter="School"><i class="fa-solid fa-graduation-cap w-4 mr-2"></i>School</button>
+                    <button class="task-filter-btn" data-filter="Life"><i class="fa-solid fa-person-running w-4 mr-2"></i>Life</button>
+                    <button class="task-filter-btn" data-filter="Application"><i class="fa-solid fa-file-lines w-4 mr-2"></i>Application</button>
+                    <button class="task-filter-btn" data-filter="Social"><i class="fa-solid fa-users w-4 mr-2"></i>Social</button>
+                    <button class="task-filter-btn" data-filter="completed"><i class="fa-solid fa-check w-4 mr-2"></i>Completed</button>
                 </div>
 
                 <!-- Task List -->
