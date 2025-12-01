@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 
     <script>
         tailwind.config = {
@@ -25,9 +25,14 @@
                     },
                     colors: {
                         brand: {
+                            // Dark Theme Colors
                             dark: '#0f0f13',
                             card: '#18181b',
-                            accent: 'var(--brand-accent)', // Dynamic Color
+                            // Light Theme Colors
+                            light: '#f9fafb',
+                            lightCard: '#ffffff',
+
+                            accent: '#8b5cf6', // Violet
                             success: '#10b981',
                             warning: '#f59e0b',
                             danger: '#ef4444',
@@ -39,52 +44,63 @@
     </script>
 
     <style>
-        :root {
-            --brand-accent: #8b5cf6; /* Default Violet */
-        }
-
-        body {
+        /* Base styles for dark mode (default) */
+        .dark body {
             background-color: #050505;
             color: #e4e4e7;
-            -webkit-font-smoothing: antialiased;
         }
-
-        /* Glassmorphism Utilities */
-        .glass {
+        .dark .glass {
             background: rgba(24, 24, 27, 0.6);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
-
-        .glass-heavy {
+        .dark .glass-heavy {
             background: rgba(10, 10, 10, 0.85);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
         }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
+        /* Light mode overrides */
+        body {
+            -webkit-font-smoothing: antialiased;
+            transition: background-color 0.3s, color 0.3s;
         }
-        ::-webkit-scrollbar-track {
-            background: #0f0f13;
+        .light body {
+            background-color: #f3f4f6;
+            color: #1f2937;
         }
-        ::-webkit-scrollbar-thumb {
-            background: #3f3f46;
-            border-radius: 3px;
+        .light .glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #52525b;
+        .light .glass-heavy {
+             background: rgba(243, 244, 246, 0.95);
+             backdrop-filter: blur(16px);
+             -webkit-backdrop-filter: blur(16px);
+        }
+        .light .nav-btn {
+            color: #6b7280;
+        }
+        .light .nav-btn.active {
+            background-color: #e5e7eb;
+            color: #1f2937;
         }
 
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0f0f13; }
+        .light ::-webkit-scrollbar-track { background: #e5e7eb; }
+        ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 3px; }
+        .light ::-webkit-scrollbar-thumb { background: #9ca3af; }
+        ::-webkit-scrollbar-thumb:hover { background: #52525b; }
+        .light ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
         /* Animations */
         @keyframes fadeIn {
@@ -98,40 +114,53 @@
         .timer-circle {
             transition: stroke-dashoffset 1s linear;
         }
-
-        /* Progress Bar Animation */
-        .xp-bar {
-            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.5rem;
+            width: 1rem;
+            height: 1rem;
+            border-radius: 50%;
+            background-color: var(--color);
+            border: 2px solid var(--border-color);
+            z-index: 10;
+            transform: translateX(-50%);
+        }
+        .timeline-item {
+            padding-left: 1rem;
+            position: relative;
         }
     </style>
 </head>
-<body class="h-screen overflow-hidden flex flex-col md:flex-row">
+<body class="h-screen overflow-hidden flex flex-col md:flex-row font-sans">
 
     <!-- Mobile Navigation (Bottom) -->
-    <nav class="md:hidden fixed bottom-0 w-full glass-heavy z-50 border-t border-white/10 flex justify-around py-3 px-2">
-        <button onclick="router('dashboard')" class="nav-btn text-gray-400 hover:text-white flex flex-col items-center gap-1 active" data-target="dashboard">
+    <nav class="md:hidden fixed bottom-0 w-full glass-heavy z-50 border-t border-white/10 dark:border-white/10 flex justify-around py-3 px-2">
+        <button onclick="router('dashboard')" class="nav-btn text-gray-400 hover:text-brand-accent flex flex-col items-center gap-1 active" data-target="dashboard">
             <i class="fa-solid fa-bolt text-lg"></i>
             <span class="text-[10px]">Home</span>
         </button>
-        <button onclick="router('calendar')" class="nav-btn text-gray-400 hover:text-white flex flex-col items-center gap-1" data-target="calendar">
+        <button onclick="router('calendar')" class="nav-btn text-gray-400 hover:text-brand-accent flex flex-col items-center gap-1" data-target="calendar">
             <i class="fa-regular fa-calendar text-lg"></i>
             <span class="text-[10px]">Agenda</span>
         </button>
-        <button onclick="openAddModal()" class="text-white bg-brand-accent rounded-full w-12 h-12 flex items-center justify-center -mt-6 shadow-lg shadow-brand-accent/30 border-4 border-[#050505]">
+        <button onclick="openAddModal()" class="text-white bg-brand-accent rounded-full w-12 h-12 flex items-center justify-center -mt-6 shadow-lg shadow-brand-accent/30 border-4 border-[#050505] dark:border-[#050505] light:border-[#f3f4f6]">
             <i class="fa-solid fa-plus text-xl"></i>
         </button>
-        <button onclick="router('tasks')" class="nav-btn text-gray-400 hover:text-white flex flex-col items-center gap-1" data-target="tasks">
+        <button onclick="router('tasks')" class="nav-btn text-gray-400 hover:text-brand-accent flex flex-col items-center gap-1" data-target="tasks">
             <i class="fa-solid fa-list-check text-lg"></i>
             <span class="text-[10px]">Tasks</span>
         </button>
-        <button onclick="router('grades')" class="nav-btn text-gray-400 hover:text-white flex flex-col items-center gap-1" data-target="grades">
-            <i class="fa-solid fa-graduation-cap text-lg"></i>
-            <span class="text-[10px]">Grades</span>
+        <button onclick="router('settings')" class="nav-btn text-gray-400 hover:text-brand-accent flex flex-col items-center gap-1" data-target="settings">
+            <i class="fa-solid fa-gear text-lg"></i>
+            <span class="text-[10px]">Settings</span>
         </button>
     </nav>
 
     <!-- Desktop Navigation (Sidebar) -->
-    <aside class="hidden md:flex w-64 glass flex-col justify-between p-6 border-r border-white/10 z-40">
+    <aside class="hidden md:flex w-64 glass flex-col justify-between p-6 border-r border-white/10 dark:border-white/10 z-40 light:border-gray-200">
         <div>
             <div class="flex items-center gap-3 mb-10">
                 <div class="w-8 h-8 rounded bg-brand-accent flex items-center justify-center font-bold text-white">L</div>
@@ -139,37 +168,34 @@
             </div>
 
             <nav class="space-y-2">
-                <button onclick="router('dashboard')" class="nav-btn w-full text-left px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition-all flex items-center gap-3 active" data-target="dashboard">
+                <button onclick="router('dashboard')" class="nav-btn w-full text-left px-4 py-3 rounded-xl hover:bg-white/5 light:hover:bg-gray-100 transition-all flex items-center gap-3 active" data-target="dashboard">
                     <i class="fa-solid fa-bolt w-5"></i> Dashboard
                 </button>
-                <button onclick="router('calendar')" class="nav-btn w-full text-left px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition-all flex items-center gap-3" data-target="calendar">
-                    <i class="fa-regular fa-calendar w-5"></i> Calendar
+                <button onclick="router('calendar')" class="nav-btn w-full text-left px-4 py-3 rounded-xl hover:bg-white/5 light:hover:bg-gray-100 transition-all flex items-center gap-3" data-target="calendar">
+                    <i class="fa-regular fa-calendar w-5"></i> Agenda
                 </button>
-                <button onclick="router('tasks')" class="nav-btn w-full text-left px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition-all flex items-center gap-3" data-target="tasks">
+                <button onclick="router('tasks')" class="nav-btn w-full text-left px-4 py-3 rounded-xl hover:bg-white/5 light:hover:bg-gray-100 transition-all flex items-center gap-3" data-target="tasks">
                     <i class="fa-solid fa-list-check w-5"></i> Tasks
                 </button>
-                <button onclick="router('grades')" class="nav-btn w-full text-left px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition-all flex items-center gap-3" data-target="grades">
-                    <i class="fa-solid fa-graduation-cap w-5"></i> Grades & GPA
-                </button>
-                <button onclick="router('focus')" class="nav-btn w-full text-left px-4 py-3 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white transition-all flex items-center gap-3" data-target="focus">
+                <button onclick="router('focus')" class="nav-btn w-full text-left px-4 py-3 rounded-xl hover:bg-white/5 light:hover:bg-gray-100 transition-all flex items-center gap-3" data-target="focus">
                     <i class="fa-solid fa-headphones w-5"></i> Focus Mode
+                </button>
+                 <button onclick="router('settings')" class="nav-btn w-full text-left px-4 py-3 rounded-xl hover:bg-white/5 light:hover:bg-gray-100 transition-all flex items-center gap-3" data-target="settings">
+                    <i class="fa-solid fa-gear w-5"></i> Settings
                 </button>
             </nav>
         </div>
 
         <div class="space-y-4">
-             <button onclick="openAddModal()" class="w-full bg-brand-accent hover:opacity-90 text-white py-3 rounded-xl font-semibold shadow-lg shadow-brand-accent/20 transition-all flex items-center justify-center gap-2">
+             <button onclick="openAddModal()" class="w-full bg-brand-accent hover:bg-violet-600 text-white py-3 rounded-xl font-semibold shadow-lg shadow-brand-accent/20 transition-all flex items-center justify-center gap-2">
                 <i class="fa-solid fa-plus"></i> Add New
             </button>
-            <div id="mini-profile" class="flex items-center gap-3 p-3 rounded-xl bg-white/5 cursor-pointer hover:bg-white/10 group" onclick="openSettingsModal()">
-                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-gray-700 to-gray-500 flex items-center justify-center relative">
-                    <i class="fa-solid fa-user text-xs"></i>
-                </div>
-                <div class="flex-1">
-                    <p class="text-xs text-gray-400">Level <span id="sidebar-level">1</span></p>
+            <div id="mini-profile" class="flex items-center gap-3 p-3 rounded-xl bg-white/5 light:bg-gray-100 cursor-pointer hover:bg-white/10 light:hover:bg-gray-200" onclick="clearData()">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-400 to-emerald-400"></div>
+                <div>
+                    <p class="text-xs text-gray-400 light:text-gray-500">Settings / Reset</p>
                     <p class="text-sm font-semibold" id="sidebar-username">Student</p>
                 </div>
-                <i class="fa-solid fa-gear text-gray-500 group-hover:text-white transition"></i>
             </div>
         </div>
     </aside>
@@ -181,42 +207,20 @@
 
     <!-- MODALS -->
 
-    <!-- Settings Modal -->
-    <div id="settings-modal" class="fixed inset-0 z-[70] bg-black/90 flex items-center justify-center hidden" onclick="if(event.target === this) closeSettingsModal()">
-        <div class="glass w-full max-w-md p-6 rounded-2xl animate-enter mx-4">
-            <h2 class="text-xl font-bold mb-4">Settings</h2>
-            
-            <div class="mb-6">
-                <p class="text-sm text-gray-400 mb-3 uppercase font-bold tracking-widest">Theme Color</p>
-                <div class="flex gap-4">
-                    <button onclick="changeTheme('#8b5cf6')" class="w-10 h-10 rounded-full bg-violet-500 border-2 border-transparent hover:border-white focus:ring-2 ring-offset-2 ring-offset-black ring-white"></button>
-                    <button onclick="changeTheme('#3b82f6')" class="w-10 h-10 rounded-full bg-blue-500 border-2 border-transparent hover:border-white focus:ring-2 ring-offset-2 ring-offset-black ring-white"></button>
-                    <button onclick="changeTheme('#10b981')" class="w-10 h-10 rounded-full bg-emerald-500 border-2 border-transparent hover:border-white focus:ring-2 ring-offset-2 ring-offset-black ring-white"></button>
-                    <button onclick="changeTheme('#f43f5e')" class="w-10 h-10 rounded-full bg-rose-500 border-2 border-transparent hover:border-white focus:ring-2 ring-offset-2 ring-offset-black ring-white"></button>
-                    <button onclick="changeTheme('#f59e0b')" class="w-10 h-10 rounded-full bg-amber-500 border-2 border-transparent hover:border-white focus:ring-2 ring-offset-2 ring-offset-black ring-white"></button>
-                </div>
-            </div>
-
-            <div class="border-t border-white/10 pt-4">
-                <button onclick="clearData()" class="text-red-500 text-sm hover:underline">Reset All Data</button>
-            </div>
-        </div>
-    </div>
-
     <!-- Onboarding Modal -->
-    <div id="onboarding-modal" class="fixed inset-0 z-[60] bg-black bg-opacity-90 flex items-center justify-center hidden">
-        <div class="glass w-full max-w-lg p-8 rounded-2xl animate-enter mx-4">
+    <div id="onboarding-modal" class="fixed inset-0 z-[60] bg-black bg-opacity-90 dark:bg-opacity-90 light:bg-black/50 flex items-center justify-center hidden">
+        <div class="glass w-full max-w-lg p-8 rounded-2xl animate-enter mx-4 light:text-gray-900 light:bg-white/90">
             <h2 class="text-3xl font-bold mb-2">Welcome to LOCKIN</h2>
-            <p class="text-gray-400 mb-6">Let's set up your profile to optimize your schedule.</p>
+            <p class="text-gray-400 dark:text-gray-400 light:text-gray-600 mb-6">Let's set up your profile to optimize your schedule.</p>
             
             <form id="onboarding-form" class="space-y-4">
                 <div>
-                    <label class="block text-sm text-gray-400 mb-1">Your Name</label>
-                    <input type="text" id="ob-name" class="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-brand-accent" placeholder="e.g. Alex" required>
+                    <label class="block text-sm text-gray-400 dark:text-gray-400 light:text-gray-600 mb-1">Your Name</label>
+                    <input type="text" id="ob-name" class="w-full bg-white/5 border border-white/10 dark:bg-white/5 dark:border-white/10 light:bg-gray-100 light:border-gray-300 rounded-lg p-3 text-white dark:text-white light:text-gray-900 focus:outline-none focus:border-brand-accent" placeholder="e.g. Alex" required>
                 </div>
                 <div>
-                    <label class="block text-sm text-gray-400 mb-1">Grade Level</label>
-                    <select id="ob-grade" class="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:outline-none">
+                    <label class="block text-sm text-gray-400 dark:text-gray-400 light:text-gray-600 mb-1">Grade Level</label>
+                    <select id="ob-grade" class="w-full bg-white/5 border border-white/10 dark:bg-white/5 dark:border-white/10 light:bg-gray-100 light:border-gray-300 rounded-lg p-3 text-white dark:text-white light:text-gray-900 focus:outline-none">
                         <option value="9">Grade 9 (Freshman)</option>
                         <option value="10">Grade 10 (Sophomore)</option>
                         <option value="11">Grade 11 (Junior)</option>
@@ -224,25 +228,28 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-sm text-gray-400 mb-1">Top Goal</label>
-                    <input type="text" id="ob-goal" class="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white focus:outline-none focus:border-brand-accent" placeholder="e.g. Get into Stanford, Pass Math">
+                    <label class="block text-sm text-gray-400 dark:text-gray-400 light:text-gray-600 mb-1">Schedule Type</label>
+                    <select id="ob-schedule-type" class="w-full bg-white/5 border border-white/10 dark:bg-white/5 dark:border-white/10 light:bg-gray-100 light:border-gray-300 rounded-lg p-3 text-white dark:text-white light:text-gray-900 focus:outline-none">
+                        <option value="Static">Static (Same classes every day)</option>
+                        <option value="AB">A/B Day Rotation</option>
+                    </select>
                 </div>
-                <button type="submit" class="w-full bg-white text-black font-bold py-3 rounded-lg hover:bg-gray-200 mt-4">Start Locking In</button>
+                <button type="submit" class="w-full bg-brand-accent text-white font-bold py-3 rounded-lg hover:bg-violet-600 mt-4">Start Locking In</button>
             </form>
         </div>
     </div>
 
     <!-- Add Item Modal -->
     <div id="add-modal" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm flex items-end md:items-center justify-center hidden" onclick="if(event.target === this) closeAddModal()">
-        <div class="glass-heavy w-full max-w-lg p-6 rounded-t-2xl md:rounded-2xl animate-enter mx-auto">
+        <div class="glass-heavy w-full max-w-lg p-6 rounded-t-2xl md:rounded-2xl animate-enter mx-auto light:bg-gray-100/90 light:text-gray-900">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-xl font-bold">Quick Add</h3>
-                <button onclick="closeAddModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                <button onclick="closeAddModal()" class="text-gray-400 hover:text-white light:hover:text-gray-800"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
-            <div class="flex gap-4 mb-4 border-b border-white/10 pb-2">
+            <div class="flex gap-4 mb-4 border-b border-white/10 dark:border-white/10 light:border-gray-300 pb-2">
                 <button onclick="switchAddTab('task')" id="tab-task" class="text-sm font-semibold text-brand-accent border-b-2 border-brand-accent pb-2 px-2 transition-all">Task</button>
-                <button onclick="switchAddTab('event')" id="tab-event" class="text-sm font-semibold text-gray-400 pb-2 px-2 transition-all hover:text-white">Event</button>
+                <button onclick="switchAddTab('event')" id="tab-event" class="text-sm font-semibold text-gray-400 dark:text-gray-400 light:text-gray-500 pb-2 px-2 transition-all hover:text-white light:hover:text-gray-900">Event</button>
             </div>
 
             <form id="add-form">
@@ -250,13 +257,13 @@
                 
                 <div class="space-y-4">
                     <div>
-                        <input type="text" id="add-title" class="w-full bg-transparent text-xl font-semibold placeholder-gray-600 focus:outline-none" placeholder="What needs to be done?" required autofocus>
+                        <input type="text" id="add-title" class="w-full bg-transparent text-xl font-semibold placeholder-gray-600 dark:placeholder-gray-600 light:placeholder-gray-400 focus:outline-none light:text-gray-900" placeholder="What needs to be done?" required autofocus>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="text-xs text-gray-500 uppercase">Category</label>
-                            <select id="add-category" class="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-sm text-white mt-1">
+                            <select id="add-category" class="w-full bg-white/5 border border-white/10 dark:bg-white/5 dark:border-white/10 light:bg-gray-100 light:border-gray-300 rounded-lg p-2 text-sm text-white dark:text-white light:text-gray-900 mt-1">
                                 <option value="School">School</option>
                                 <option value="Life">Life</option>
                                 <option value="Application">Application</option>
@@ -265,13 +272,13 @@
                         </div>
                         <div>
                             <label class="text-xs text-gray-500 uppercase">Due Date</label>
-                            <input type="date" id="add-date" class="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-sm text-white mt-1">
+                            <input type="date" id="add-date" class="w-full bg-white/5 border border-white/10 dark:bg-white/5 dark:border-white/10 light:bg-gray-100 light:border-gray-300 rounded-lg p-2 text-sm text-white dark:text-white light:text-gray-900 mt-1">
                         </div>
                     </div>
                     
                     <div id="time-input-container" class="hidden">
-                         <label class="text-xs text-gray-500 uppercase">Time</label>
-                         <input type="time" id="add-time" class="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-sm text-white mt-1">
+                         <label class="text-xs text-gray-500 uppercase">Time (Optional)</label>
+                         <input type="time" id="add-time" class="w-full bg-white/5 border border-white/10 dark:bg-white/5 dark:border-white/10 light:bg-gray-100 light:border-gray-300 rounded-lg p-2 text-sm text-white dark:text-white light:text-gray-900 mt-1">
                     </div>
 
                     <div class="flex gap-2 pt-2">
@@ -281,7 +288,7 @@
                         <input type="hidden" id="add-priority" value="Medium">
                     </div>
 
-                    <button type="submit" class="w-full bg-brand-accent hover:opacity-90 py-3 rounded-lg font-bold shadow-lg shadow-brand-accent/20">
+                    <button type="submit" class="w-full bg-brand-accent hover:bg-violet-600 py-3 rounded-lg font-bold shadow-lg shadow-brand-accent/20">
                         Create <span id="btn-action-text">Task</span>
                     </button>
                 </div>
@@ -289,34 +296,54 @@
         </div>
     </div>
 
+
     <!-- JAVASCRIPT LOGIC -->
     <script>
         // --- STATE MANAGEMENT ---
-        const STORE_KEY = 'lockin_app_data_v2'; // Bumped version for new schema
+        const STORE_KEY = 'lockin_app_data_v2';
         
         let store = {
-            user: null, // { name, grade, goal }
-            settings: { theme: '#8b5cf6' },
-            xp: 0,
-            level: 1,
+            theme: 'dark', // 'dark' or 'light'
+            user: null, // { name, grade, scheduleType }
             tasks: [], // { id, title, category, date, priority, completed }
             events: [], // { id, title, type, date, time }
-            grades: [], // { id, className, grade, type } (type: AP, Honors, Regular)
             habits: [
                 { id: 1, title: "Sleep before 12", completedToday: false },
                 { id: 2, title: "Drink Water", completedToday: false },
                 { id: 3, title: "Study 30m", completedToday: false }
             ],
-            focusLog: 0 // minutes
+            focusLog: 0, // minutes
+            schedule: {
+                dayType: 'A', // Current rotating day, default A
+                classes: [
+                    // Example default classes (user customizes in settings)
+                    { id: 101, name: "AP English", color: "blue", blocks: ["A1"] },
+                    { id: 102, name: "AP US History", color: "yellow", blocks: ["B1"] },
+                    { id: 103, name: "Calculus", color: "red", blocks: ["A2", "B2"] },
+                    { id: 104, name: "Physics", color: "green", blocks: ["A3"] },
+                ],
+                blockMap: { // Defines which time slots map to which block codes (A1, B2, etc.)
+                    'A1': { start: '08:30', end: '09:45' },
+                    'B1': { start: '09:50', end: '11:05' },
+                    'A2': { start: '11:10', end: '12:25' },
+                    'B2': { start: '13:00', end: '14:15' },
+                    'A3': { start: '14:20', end: '15:35' },
+                }
+            }
         };
+
+        let currentCalendarView = 'daily'; // daily, weekly, monthly
+        let currentCalendarDate = new Date();
 
         // --- INIT & UTILS ---
         function init() {
             const data = localStorage.getItem(STORE_KEY);
             if (data) {
-                const parsed = JSON.parse(data);
-                store = { ...store, ...parsed }; // Merge to ensure new fields exist
-                // Reset habits if new day
+                const storedData = JSON.parse(data);
+                // Merge stored data, preserving new keys like 'theme' and default schedule structure if missing
+                store = { ...store, ...storedData };
+
+                // Reset habits if new day (simplified logic)
                 const lastLogin = localStorage.getItem('lockin_last_login');
                 const today = new Date().toDateString();
                 if(lastLogin !== today) {
@@ -326,7 +353,7 @@
             }
             
             // Apply Theme
-            changeTheme(store.settings.theme, false);
+            setTheme(store.theme);
 
             if (!store.user) {
                 document.getElementById('onboarding-modal').classList.remove('hidden');
@@ -340,62 +367,38 @@
             localStorage.setItem(STORE_KEY, JSON.stringify(store));
             updateSidebar();
         }
+        
+        function setTheme(theme) {
+            store.theme = theme;
+            document.documentElement.className = theme;
+            saveData();
+        }
 
         function updateSidebar() {
             if(store.user) {
                 document.getElementById('sidebar-username').textContent = store.user.name;
-                document.getElementById('sidebar-level').textContent = store.level;
             }
         }
 
         function clearData() {
-            if(confirm("Reset all data? This cannot be undone.")) {
+            if(confirm("DANGER ZONE: Reset all data? This cannot be undone.")) {
                 localStorage.removeItem(STORE_KEY);
                 location.reload();
-            }
-        }
-
-        function changeTheme(color, save = true) {
-            document.documentElement.style.setProperty('--brand-accent', color);
-            if(save) {
-                store.settings.theme = color;
-                saveData();
-            }
-        }
-
-        function openSettingsModal() {
-            document.getElementById('settings-modal').classList.remove('hidden');
-        }
-
-        function closeSettingsModal() {
-            document.getElementById('settings-modal').classList.add('hidden');
-        }
-
-        function addXP(amount) {
-            store.xp += amount;
-            // Level up logic: Level = 1 + floor(xp / 1000)
-            const newLevel = 1 + Math.floor(store.xp / 1000);
-            if(newLevel > store.level) {
-                alert(`LEVEL UP! You are now Level ${newLevel}`);
-                store.level = newLevel;
-            }
-            saveData();
-            // Refresh dashboard if active to show bar update
-            if(document.querySelector('.nav-btn[data-target="dashboard"]').classList.contains('active')) {
-                renderDashboard(document.getElementById('main-container'));
             }
         }
 
         function router(viewName) {
             // Update UI Active States
             document.querySelectorAll('.nav-btn').forEach(btn => {
-                if(btn.dataset.target === viewName) {
-                    btn.classList.add('text-white', 'active');
-                    if(window.innerWidth >= 768) btn.classList.add('bg-white/5');
-                    btn.classList.remove('text-gray-400');
-                } else {
-                    btn.classList.remove('text-white', 'active', 'bg-white/5');
-                    btn.classList.add('text-gray-400');
+                const isActive = btn.dataset.target === viewName;
+                btn.classList.toggle('active', isActive);
+                btn.classList.toggle('text-white', isActive);
+                btn.classList.toggle('text-brand-accent', isActive);
+                btn.classList.toggle('bg-white/5', isActive && store.theme === 'dark' && window.innerWidth >= 768);
+                btn.classList.toggle('light:bg-gray-100', isActive && store.theme === 'light' && window.innerWidth >= 768);
+                
+                if (window.innerWidth < 768) {
+                    btn.classList.remove('bg-white/5', 'light:bg-gray-100');
                 }
             });
 
@@ -408,14 +411,78 @@
                 case 'tasks': renderTasks(container); break;
                 case 'calendar': renderCalendar(container); break;
                 case 'focus': renderFocus(container); break;
-                case 'grades': renderGrades(container); break;
+                case 'settings': renderSettings(container); break;
             }
         }
+
+        // --- SCHEDULE LOGIC ---
+        function getClassesForDay(dayType) {
+            const classes = store.schedule.classes || [];
+            const blockMap = store.schedule.blockMap || {};
+            
+            let scheduleItems = [];
+
+            // 1. Get all blocks defined in the map (e.g., A1, B1, A2, B2)
+            const allBlockKeys = Object.keys(blockMap);
+
+            // 2. Filter classes by the given dayType (A or B)
+            classes.forEach(cls => {
+                cls.blocks.forEach(blockKey => {
+                    // Check if the block key starts with the required dayType letter
+                    // (e.g., if dayType='A', only include blocks like 'A1', 'A2', 'A3')
+                    const requiredBlockKeyPrefix = store.user.scheduleType === 'AB' ? dayType : '';
+                    
+                    if (blockKey.startsWith(requiredBlockKeyPrefix) || store.user.scheduleType === 'Static') {
+                        const time = blockMap[blockKey];
+                        if (time) {
+                            scheduleItems.push({
+                                title: cls.name,
+                                type: 'Class',
+                                color: cls.color,
+                                start: time.start,
+                                end: time.end,
+                                timeSort: time.start.replace(':', '')
+                            });
+                        }
+                    }
+                });
+            });
+
+            // 3. Add events for today
+            const todayStr = currentCalendarDate.toISOString().split('T')[0];
+            const todayEvents = store.events.filter(e => e.date === todayStr);
+
+            todayEvents.forEach(event => {
+                scheduleItems.push({
+                    title: event.title,
+                    type: event.type,
+                    color: getCategoryColor(event.type).replace('text-', '').replace('-400', ''),
+                    start: event.time || '00:00',
+                    end: event.time ? getEndTime(event.time) : '23:59',
+                    timeSort: event.time ? event.time.replace(':', '') : '0000'
+                });
+            });
+
+            // 4. Sort by start time
+            return scheduleItems.sort((a, b) => (a.timeSort || '0000') - (b.timeSort || '0000'));
+        }
+
+        // Helper to get a simple end time 1 hour later for events if not specified
+        function getEndTime(startTime) {
+            if (!startTime) return '23:59';
+            const [h, m] = startTime.split(':').map(Number);
+            let endH = h + 1;
+            let endM = m;
+            if (endH >= 24) endH = 23;
+            return `${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}`;
+        }
+
 
         // --- VIEWS ---
 
         function renderDashboard(container) {
             const today = new Date();
+            const todayStr = today.toISOString().split('T')[0];
             const hour = today.getHours();
             let greeting = "Good Morning";
             if (hour >= 12) greeting = "Good Afternoon";
@@ -423,12 +490,13 @@
 
             // Stats
             const pendingTasks = store.tasks.filter(t => !t.completed).length;
-            const eventsToday = store.events.filter(e => e.date === today.toISOString().split('T')[0]).length;
             
-            // XP Progress
-            const xpForNextLevel = store.level * 1000;
-            const xpCurrentLevel = store.xp % 1000;
-            const xpPercent = (xpCurrentLevel / 1000) * 100;
+            // Dynamic Schedule
+            const dayType = store.schedule.dayType || 'A';
+            const todaysSchedule = getClassesForDay(dayType);
+            const classesToday = todaysSchedule.filter(item => item.type === 'Class').length;
+            const eventsToday = todaysSchedule.filter(item => item.type !== 'Class').length;
+
 
             // Overload Logic
             let overloadBanner = '';
@@ -447,7 +515,7 @@
                 <div class="max-w-5xl mx-auto p-6 animate-enter">
                     <header class="mb-8 flex justify-between items-end">
                         <div>
-                            <p class="text-gray-400 text-sm mb-1">${today.toDateString()}</p>
+                            <p class="text-gray-400 text-sm mb-1">${today.toDateString()} &bull; Day ${dayType}</p>
                             <h2 class="text-3xl font-bold">${greeting}, ${store.user.name}.</h2>
                         </div>
                         <div class="hidden md:block text-right">
@@ -456,249 +524,176 @@
                         </div>
                     </header>
 
-                    <!-- Level Bar -->
-                    <div class="mb-8">
-                        <div class="flex justify-between text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">
-                            <span>Level ${store.level}</span>
-                            <span>${xpCurrentLevel} / 1000 XP</span>
-                        </div>
-                        <div class="h-2 w-full bg-white/10 rounded-full overflow-hidden">
-                            <div class="h-full bg-brand-accent xp-bar" style="width: ${xpPercent}%"></div>
-                        </div>
-                    </div>
-
                     ${overloadBanner}
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <!-- Left Col: Tasks & Habits -->
+                        <!-- Left Col: Tasks & Wellness -->
                         <div class="md:col-span-2 space-y-6">
                             
                             <!-- Today's Snapshot -->
-                            <div class="grid grid-cols-2 gap-4">
+                            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
                                 <div class="glass p-5 rounded-2xl border-l-4 border-brand-accent">
                                     <p class="text-gray-400 text-xs uppercase mb-2">Pending Tasks</p>
                                     <p class="text-3xl font-bold">${pendingTasks}</p>
                                 </div>
                                 <div class="glass p-5 rounded-2xl border-l-4 border-blue-500">
-                                    <p class="text-gray-400 text-xs uppercase mb-2">Events Today</p>
+                                    <p class="text-gray-400 text-xs uppercase mb-2">Classes Today</p>
+                                    <p class="text-3xl font-bold">${classesToday}</p>
+                                </div>
+                                <div class="glass p-5 rounded-2xl border-l-4 border-yellow-500">
+                                    <p class="text-gray-400 text-xs uppercase mb-2">Social/Life</p>
                                     <p class="text-3xl font-bold">${eventsToday}</p>
+                                </div>
+                                <div class="glass p-5 rounded-2xl border-l-4 border-green-500">
+                                    <p class="text-gray-400 text-xs uppercase mb-2">Avg. Streak</p>
+                                    <p class="text-3xl font-bold">7<span class="text-xl opacity-50">d</span></p>
                                 </div>
                             </div>
 
                             <!-- Tasks Section -->
-                            <div>
+                            <div class="glass p-6 rounded-2xl">
                                 <div class="flex justify-between items-center mb-4">
                                     <h3 class="font-bold text-lg">Up Next</h3>
                                     <button onclick="router('tasks')" class="text-xs text-brand-accent hover:underline">View All</button>
                                 </div>
                                 <div class="space-y-3">
-                                    ${store.tasks.filter(t => !t.completed).slice(0, 3).map(task => `
-                                        <div class="glass p-4 rounded-xl flex items-center gap-4 hover:bg-white/5 transition group">
-                                            <button onclick="toggleTask(${task.id})" class="w-5 h-5 rounded-full border border-gray-500 hover:border-brand-accent flex items-center justify-center transition">
-                                                <div class="w-3 h-3 rounded-full bg-brand-accent opacity-0 group-hover:opacity-100"></div>
+                                    ${store.tasks.filter(t => !t.completed).slice(0, 5).map(task => `
+                                        <div class="p-3 rounded-xl flex items-center gap-4 hover:bg-white/5 light:hover:bg-gray-100 transition group border border-white/0 light:border-gray-200 light:hover:border-gray-300">
+                                            <button onclick="toggleTask(${task.id})" class="w-5 h-5 flex-shrink-0 rounded-full border border-gray-500 dark:border-gray-500 light:border-gray-400 hover:border-brand-accent flex items-center justify-center transition">
                                             </button>
                                             <div class="flex-1">
                                                 <p class="font-semibold text-sm">${task.title}</p>
-                                                <div class="flex gap-2 text-xs text-gray-500 mt-1">
+                                                <div class="flex gap-2 text-xs text-gray-500 dark:text-gray-500 light:text-gray-600 mt-1">
                                                     <span class="${getCategoryColor(task.category)}">${task.category}</span>
                                                     <span>•</span>
-                                                    <span>${task.date || 'No Date'}</span>
+                                                    <span>${task.date ? formatDate(task.date) : 'No Date'}</span>
                                                 </div>
                                             </div>
-                                            ${task.priority === 'Critical' ? '<i class="fa-solid fa-flag text-red-500 text-xs"></i>' : ''}
+                                            ${task.priority === 'Critical' ? '<i class="fa-solid fa-flag text-red-500 text-xs flex-shrink-0"></i>' : ''}
                                         </div>
-                                    `).join('') || '<p class="text-gray-500 italic text-sm">No tasks pending. You\'re free!</p>'}
+                                    `).join('') || '<p class="text-gray-500 dark:text-gray-500 light:text-gray-600 italic text-sm">No tasks pending. You\'re free!</p>'}
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Right Col: Habits & Schedule -->
+                        <!-- Right Col: Schedule & Habits -->
                         <div class="space-y-6">
+                            <!-- Simple Schedule (Dynamic) -->
+                            <div class="glass p-6 rounded-2xl">
+                                <h3 class="font-bold text-lg mb-4">Today's Timeline</h3>
+                                <div class="relative pl-4 border-l border-white/10 dark:border-white/10 light:border-gray-300 space-y-6">
+                                    ${todaysSchedule.map(item => `
+                                        <div class="timeline-item" style="--color: ${getClassColorHex(item.color)}; --border-color: ${store.theme === 'dark' ? '#050505' : '#f3f4f6'};">
+                                            <p class="text-sm font-bold text-white dark:text-white light:text-gray-900">${item.title}</p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-500 light:text-gray-600">${item.start} — ${item.end} (${item.type})</p>
+                                        </div>
+                                    `).join('') || `
+                                         <div class="timeline-item" style="--color: #8b5cf6; --border-color: ${store.theme === 'dark' ? '#050505' : '#f3f4f6'};">
+                                            <p class="text-sm font-bold text-white dark:text-white light:text-gray-900">Break Day or Custom Schedule Needed</p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-500 light:text-gray-600">No defined blocks for Day ${dayType}. Check settings!</p>
+                                        </div>
+                                    `}
+                                </div>
+                            </div>
+                            
                             <!-- Habits -->
                             <div class="glass p-6 rounded-2xl">
                                 <h3 class="font-bold text-lg mb-4">Daily Habits</h3>
                                 <div class="space-y-3">
                                     ${store.habits.map(habit => `
                                         <div class="flex items-center justify-between cursor-pointer" onclick="toggleHabit(${habit.id})">
-                                            <span class="text-sm ${habit.completedToday ? 'text-gray-500 line-through' : 'text-gray-200'}">${habit.title}</span>
-                                            <i class="fa-solid fa-check-circle ${habit.completedToday ? 'text-brand-success' : 'text-gray-700'}"></i>
+                                            <span class="text-sm ${habit.completedToday ? 'text-gray-500 dark:text-gray-500 light:text-gray-400 line-through' : 'text-gray-200 dark:text-gray-200 light:text-gray-800'}">${habit.title}</span>
+                                            <i class="fa-solid fa-check-circle ${habit.completedToday ? 'text-brand-success' : 'text-gray-700 dark:text-gray-700 light:text-gray-300'}"></i>
                                         </div>
                                     `).join('')}
                                 </div>
                             </div>
-
-                            <!-- Simple Schedule (Demo) -->
-                            <div class="glass p-6 rounded-2xl">
-                                <h3 class="font-bold text-lg mb-4">Schedule</h3>
-                                <div class="relative pl-4 border-l border-white/10 space-y-6">
-                                    ${eventsToday > 0 ? store.events.filter(e => e.date === today.toISOString().split('T')[0]).map(e => `
-                                        <div class="relative">
-                                            <div class="absolute -left-[21px] top-1 w-3 h-3 rounded-full bg-brand-accent"></div>
-                                            <p class="text-sm font-semibold">${e.title}</p>
-                                            <p class="text-xs text-gray-500">${e.time || 'All Day'}</p>
-                                        </div>
-                                    `).join('') : `
-                                        <div class="relative">
-                                            <div class="absolute -left-[21px] top-1 w-3 h-3 rounded-full bg-blue-500"></div>
-                                            <p class="text-sm font-semibold">School Day</p>
-                                            <p class="text-xs text-gray-500">8:00 AM - 3:00 PM</p>
-                                        </div>
-                                        <p class="text-xs text-gray-500 pt-2">No specific events added.</p>
-                                    `}
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
             `;
         }
+        
+        // --- Calendar Views ---
+        function renderCalendar(container) {
+            container.innerHTML = `
+                <div class="max-w-5xl mx-auto p-6 animate-enter">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold">Agenda</h2>
+                        <div class="flex glass rounded-xl p-1 text-sm">
+                            <button onclick="setCalendarView('daily')" class="px-3 py-1 rounded-lg font-semibold transition ${currentCalendarView === 'daily' ? 'bg-brand-accent text-white' : 'hover:bg-white/10 dark:text-gray-400 light:text-gray-600'}">Day</button>
+                            <button onclick="setCalendarView('weekly')" class="px-3 py-1 rounded-lg font-semibold transition ${currentCalendarView === 'weekly' ? 'bg-brand-accent text-white' : 'hover:bg-white/10 dark:text-gray-400 light:text-gray-600'}">Week</button>
+                            <button onclick="setCalendarView('monthly')" class="px-3 py-1 rounded-lg font-semibold transition ${currentCalendarView === 'monthly' ? 'bg-brand-accent text-white' : 'hover:bg-white/10 dark:text-gray-400 light:text-gray-600'}">Month</button>
+                        </div>
+                    </div>
+                    <div id="calendar-view-container">
+                        <!-- Dynamic View Injected Here -->
+                    </div>
+                </div>
+            `;
+            setCalendarView(currentCalendarView);
+        }
 
-        function renderGrades(container) {
-            // Calculate GPA
-            let totalPoints = 0;
-            let totalClasses = store.grades.length;
+        function setCalendarView(view) {
+            currentCalendarView = view;
+            const container = document.getElementById('calendar-view-container');
+            if (!container) return;
+
+            // Clear previous view
+            container.innerHTML = '';
             
-            store.grades.forEach(g => {
-                let points = 0;
-                const grade = parseFloat(g.grade);
-                if(grade >= 90) points = 4.0;
-                else if(grade >= 80) points = 3.0;
-                else if(grade >= 70) points = 2.0;
-                else if(grade >= 60) points = 1.0;
-                else points = 0.0;
-                
-                // Add weight? (Simplified unweighted for now display, but let's assume standard)
-                totalPoints += points;
-            });
-
-            const gpa = totalClasses > 0 ? (totalPoints / totalClasses).toFixed(2) : '0.00';
-
-            container.innerHTML = `
-                <div class="max-w-3xl mx-auto p-6 animate-enter pb-24">
-                    <header class="flex justify-between items-center mb-8">
-                        <div>
-                            <h2 class="text-3xl font-bold">Grades</h2>
-                            <p class="text-gray-400 text-sm">Track your performance.</p>
-                        </div>
-                        <div class="text-right">
-                             <p class="text-4xl font-mono font-bold text-brand-accent">${gpa}</p>
-                             <p class="text-xs text-gray-500 uppercase tracking-widest">GPA (Unweighted)</p>
-                        </div>
-                    </header>
-
-                    <!-- Add Class Form -->
-                    <div class="glass p-4 rounded-xl mb-8">
-                        <form id="grade-form" class="flex gap-2 flex-col md:flex-row">
-                            <input type="text" id="g-name" placeholder="Class Name (e.g. AP Calc)" class="flex-1 bg-white/5 border border-white/10 rounded-lg p-2 text-sm text-white focus:outline-none" required>
-                            <input type="number" id="g-grade" placeholder="Current Grade %" class="w-full md:w-32 bg-white/5 border border-white/10 rounded-lg p-2 text-sm text-white focus:outline-none" required>
-                            <button type="submit" class="bg-brand-accent text-white px-6 py-2 rounded-lg font-bold text-sm">Add</button>
-                        </form>
-                    </div>
-
-                    <div class="space-y-3">
-                         ${store.grades.map(g => `
-                            <div class="glass p-4 rounded-xl flex items-center justify-between group">
-                                <div>
-                                    <p class="font-semibold">${g.className}</p>
-                                </div>
-                                <div class="flex items-center gap-4">
-                                    <div class="text-right">
-                                        <p class="text-xl font-bold ${g.grade >= 90 ? 'text-brand-success' : (g.grade >= 70 ? 'text-brand-warning' : 'text-brand-danger')}">${g.grade}%</p>
-                                    </div>
-                                    <button onclick="deleteGrade(${g.id})" class="text-gray-600 hover:text-red-500 opacity-0 group-hover:opacity-100 transition"><i class="fa-solid fa-trash"></i></button>
-                                </div>
-                            </div>
-                         `).join('') || '<div class="text-center py-8 text-gray-500 italic">No classes added yet.</div>'}
-                    </div>
-                </div>
-            `;
-
-            // Attach listener dynamically since we overwrite innerHTML
-            setTimeout(() => {
-                const form = document.getElementById('grade-form');
-                if(form) {
-                    form.addEventListener('submit', (e) => {
-                        e.preventDefault();
-                        const name = document.getElementById('g-name').value;
-                        const grade = document.getElementById('g-grade').value;
-                        
-                        store.grades.push({
-                            id: Date.now(),
-                            className: name,
-                            grade: grade
-                        });
-                        saveData();
-                        renderGrades(container);
-                    });
-                }
-            }, 0);
+            // Render new view
+            switch(view) {
+                case 'daily': renderDailyView(container); break;
+                case 'weekly': renderWeeklyView(container); break;
+                case 'monthly': renderMonthlyView(container); break;
+            }
         }
-
-        function deleteGrade(id) {
-            store.grades = store.grades.filter(g => g.id !== id);
-            saveData();
-            renderGrades(document.getElementById('main-container'));
-        }
-
-        function renderTasks(container) {
-            const sortedTasks = [...store.tasks].sort((a,b) => new Date(a.date) - new Date(b.date));
-            const active = sortedTasks.filter(t => !t.completed);
-            const completed = sortedTasks.filter(t => t.completed);
-
-            container.innerHTML = `
-                <div class="max-w-3xl mx-auto p-6 animate-enter pb-24">
-                    <h2 class="text-2xl font-bold mb-6">Tasks</h2>
-                    
-                    <!-- Filters (Visual Only for MVP) -->
-                    <div class="flex gap-2 overflow-x-auto no-scrollbar mb-6">
-                        <button class="bg-white text-black px-4 py-1.5 rounded-full text-sm font-bold whitespace-nowrap">All</button>
-                        <button class="bg-white/5 border border-white/10 text-gray-300 px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap hover:bg-white/10">School</button>
-                        <button class="bg-white/5 border border-white/10 text-gray-300 px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap hover:bg-white/10">Life</button>
-                        <button class="bg-white/5 border border-white/10 text-gray-300 px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap hover:bg-white/10">Applications</button>
+        
+        function renderDailyView(container) {
+             const dayType = store.schedule.dayType || 'A';
+             const todaysSchedule = getClassesForDay(dayType);
+             
+             container.innerHTML = `
+                <div class="glass p-6 rounded-2xl">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold">${currentCalendarDate.toDateString()} &bull; Day ${dayType}</h3>
+                        <div class="flex gap-2">
+                            <button onclick="changeDay(-1)" class="w-8 h-8 rounded bg-white/5 hover:bg-white/10 dark:text-gray-400 light:text-gray-600 flex items-center justify-center"><i class="fa-solid fa-chevron-left"></i></button>
+                            <button onclick="changeDay(1)" class="w-8 h-8 rounded bg-white/5 hover:bg-white/10 dark:text-gray-400 light:text-gray-600 flex items-center justify-center"><i class="fa-solid fa-chevron-right"></i></button>
+                        </div>
                     </div>
 
                     <div class="space-y-4">
-                        <p class="text-xs text-gray-500 font-bold tracking-widest uppercase">To Do (${active.length})</p>
-                        ${active.map(task => renderTaskItem(task)).join('')}
-                        ${active.length === 0 ? '<div class="text-center py-10 text-gray-600">No active tasks. <br> Time to relax or add more.</div>' : ''}
-                    </div>
-
-                    <div class="mt-8 space-y-4 opacity-60">
-                         <div class="flex items-center gap-2 cursor-pointer" onclick="document.getElementById('completed-list').classList.toggle('hidden')">
-                             <i class="fa-solid fa-chevron-down text-xs"></i>
-                             <p class="text-xs text-gray-500 font-bold tracking-widest uppercase">Completed (${completed.length})</p>
-                         </div>
-                         <div id="completed-list" class="space-y-2 hidden">
-                             ${completed.map(task => renderTaskItem(task)).join('')}
-                         </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function renderTaskItem(task) {
-            return `
-                <div class="glass p-4 rounded-xl flex items-start gap-4 group ${task.completed ? 'opacity-50' : ''}">
-                    <button onclick="toggleTask(${task.id})" class="mt-1 w-5 h-5 flex-shrink-0 rounded-full border ${task.completed ? 'bg-brand-success border-brand-success' : 'border-gray-500 hover:border-brand-accent'} flex items-center justify-center transition">
-                         ${task.completed ? '<i class="fa-solid fa-check text-black text-xs"></i>' : ''}
-                    </button>
-                    <div class="flex-1">
-                        <div class="flex justify-between items-start">
-                             <p class="font-semibold text-sm ${task.completed ? 'line-through text-gray-500' : ''}">${task.title}</p>
-                             <button onclick="deleteTask(${task.id})" class="text-gray-600 hover:text-red-500 transition"><i class="fa-solid fa-trash text-xs"></i></button>
-                        </div>
-                        <div class="flex gap-2 text-xs text-gray-500 mt-1 items-center">
-                            <span class="${getCategoryColor(task.category)} border border-white/5 px-1.5 py-0.5 rounded">${task.category}</span>
-                            ${task.date ? `<span><i class="fa-regular fa-clock mr-1"></i>${formatDate(task.date)}</span>` : ''}
-                            ${task.priority === 'Critical' ? '<span class="text-red-400 font-bold">!!!</span>' : ''}
+                        <p class="text-xs text-gray-500 uppercase">Hourly Timeline</p>
+                        <div class="relative pl-4 border-l border-white/10 dark:border-white/10 light:border-gray-300 space-y-3">
+                            ${todaysSchedule.map(item => `
+                                <div class="relative p-3 rounded-lg border border-white/10 dark:border-white/10 light:border-gray-200" style="background-color: ${getClassColorHex(item.color)}15;">
+                                    <div class="absolute w-3 h-3 rounded-full -left-[18px] top-4" style="background-color: ${getClassColorHex(item.color)}; border: 2px solid ${store.theme === 'dark' ? '#18181b' : '#ffffff'};"></div>
+                                    <p class="text-sm font-bold text-white dark:text-white light:text-gray-900">${item.title}</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-500 light:text-gray-600">${item.start} — ${item.end} (${item.type})</p>
+                                </div>
+                            `).join('') || '<p class="text-gray-500 italic text-sm py-4">Nothing scheduled for this date.</p>'}
                         </div>
                     </div>
                 </div>
-            `;
+             `;
+        }
+        
+        function changeDay(offset) {
+            currentCalendarDate.setDate(currentCalendarDate.getDate() + offset);
+            setCalendarView('daily');
         }
 
-        function renderCalendar(container) {
-            const date = new Date();
+        function renderWeeklyView(container) {
+            container.innerHTML = `<div class="glass p-6 rounded-2xl h-[60vh] flex items-center justify-center">
+                                    <h3 class="text-xl font-bold">Weekly View is Under Construction 🚧</h3>
+                                    <p class="text-gray-500 mt-2">Check the Daily View for now!</p>
+                                  </div>`;
+        }
+
+        function renderMonthlyView(container) {
+            const date = new Date(currentCalendarDate);
             const year = date.getFullYear();
             const month = date.getMonth();
             const monthName = date.toLocaleString('default', { month: 'long' });
@@ -715,66 +710,105 @@
                 const dayString = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
                 const hasEvent = store.events.some(e => e.date === dayString);
                 const hasTask = store.tasks.some(t => t.date === dayString && !t.completed);
-                const isToday = d === date.getDate();
+                const isToday = d === new Date().getDate() && month === new Date().getMonth() && year === new Date().getFullYear();
 
                 daysHtml += `
-                    <div class="aspect-square rounded-lg flex flex-col items-center justify-center relative ${isToday ? 'bg-brand-accent text-white' : 'hover:bg-white/5 text-gray-300'}">
-                        <span class="text-sm">${d}</span>
+                    <div class="aspect-square rounded-lg flex flex-col items-center justify-center relative ${isToday ? 'bg-brand-accent text-white' : 'hover:bg-white/5 dark:text-gray-300 light:text-gray-800'} transition-colors cursor-pointer" onclick="setCalendarDate('${dayString}')">
+                        <span class="text-sm font-semibold">${d}</span>
                         <div class="flex gap-1 mt-1">
-                            ${hasEvent ? `<div class="w-1 h-1 rounded-full ${isToday ? 'bg-white' : 'bg-blue-400'}"></div>` : ''}
-                            ${hasTask ? `<div class="w-1 h-1 rounded-full ${isToday ? 'bg-white' : 'bg-green-400'}"></div>` : ''}
+                            ${hasEvent ? `<div class="w-1.5 h-1.5 rounded-full ${isToday ? 'bg-white' : 'bg-blue-400'}"></div>` : ''}
+                            ${hasTask ? `<div class="w-1.5 h-1.5 rounded-full ${isToday ? 'bg-white' : 'bg-green-400'}"></div>` : ''}
                         </div>
                     </div>
                 `;
             }
 
-            // Events List for selected month
-            const monthEvents = store.events
-                .filter(e => new Date(e.date).getMonth() === month)
-                .sort((a,b) => new Date(a.date) - new Date(b.date));
-
-            container.innerHTML = `
-                <div class="max-w-4xl mx-auto p-6 animate-enter h-full flex flex-col md:flex-row gap-8">
-                    <!-- Calendar Grid -->
-                    <div class="flex-1">
-                        <div class="flex justify-between items-center mb-6">
-                            <h2 class="text-2xl font-bold">${monthName} ${year}</h2>
-                            <div class="flex gap-2">
-                                <button class="w-8 h-8 rounded bg-white/5 hover:bg-white/10 flex items-center justify-center"><i class="fa-solid fa-chevron-left"></i></button>
-                                <button class="w-8 h-8 rounded bg-white/5 hover:bg-white/10 flex items-center justify-center"><i class="fa-solid fa-chevron-right"></i></button>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-7 gap-2 mb-2 text-center text-xs text-gray-500 font-bold uppercase">
-                            <div>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div>
-                        </div>
-                        <div class="grid grid-cols-7 gap-2">
-                            ${daysHtml}
+             container.innerHTML = `
+                <div class="glass p-6 rounded-2xl">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-2xl font-bold">${monthName} ${year}</h3>
+                        <div class="flex gap-2">
+                            <button onclick="changeMonth(-1)" class="w-8 h-8 rounded bg-white/5 hover:bg-white/10 dark:text-gray-400 light:text-gray-600 flex items-center justify-center"><i class="fa-solid fa-chevron-left"></i></button>
+                            <button onclick="changeMonth(1)" class="w-8 h-8 rounded bg-white/5 hover:bg-white/10 dark:text-gray-400 light:text-gray-600 flex items-center justify-center"><i class="fa-solid fa-chevron-right"></i></button>
                         </div>
                     </div>
+                    <div class="grid grid-cols-7 gap-2 mb-2 text-center text-xs text-gray-500 font-bold uppercase">
+                        <div>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div>
+                    </div>
+                    <div class="grid grid-cols-7 gap-2">
+                        ${daysHtml}
+                    </div>
+                </div>
+            `;
+        }
+        
+        function changeMonth(offset) {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + offset);
+            setCalendarView('monthly');
+        }
 
-                    <!-- Upcoming List -->
-                    <div class="md:w-80 glass p-6 rounded-2xl h-fit">
-                        <h3 class="font-bold mb-4">Upcoming Events</h3>
-                        <div class="space-y-4">
-                            ${monthEvents.map(e => `
-                                <div class="flex gap-3">
-                                    <div class="flex flex-col items-center text-gray-400 w-10">
-                                        <span class="text-xs font-bold uppercase">${new Date(e.date).toLocaleString('default', {month:'short'})}</span>
-                                        <span class="text-lg font-bold text-white">${new Date(e.date).getDate() + 1}</span>
-                                    </div>
-                                    <div class="flex-1 pb-3 border-b border-white/10">
-                                        <p class="text-sm font-semibold">${e.title}</p>
-                                        <p class="text-xs text-gray-500">${e.type} • ${e.time || 'All Day'}</p>
-                                    </div>
-                                </div>
-                            `).join('') || '<p class="text-sm text-gray-500">No events this month.</p>'}
-                        </div>
-                        <button onclick="openAddModal(true)" class="w-full mt-4 py-2 border border-white/10 rounded-lg text-sm hover:bg-white/5 transition">Add Event</button>
+        function setCalendarDate(dateString) {
+            currentCalendarDate = new Date(dateString);
+            setCalendarView('daily');
+        }
+
+        function renderTasks(container) {
+            const sortedTasks = [...store.tasks].sort((a,b) => new Date(a.date) - new Date(b.date));
+            const active = sortedTasks.filter(t => !t.completed);
+            const completed = sortedTasks.filter(t => t.completed);
+
+            container.innerHTML = `
+                <div class="max-w-3xl mx-auto p-6 animate-enter pb-24">
+                    <h2 class="text-2xl font-bold mb-6">Tasks</h2>
+                    
+                    <!-- Filters (Visual Only for MVP) -->
+                    <div class="flex gap-2 overflow-x-auto no-scrollbar mb-6">
+                        <button class="bg-brand-accent text-white px-4 py-1.5 rounded-full text-sm font-bold whitespace-nowrap">All</button>
+                        <button class="bg-white/5 dark:bg-white/5 light:bg-gray-100 border border-white/10 dark:border-white/10 light:border-gray-300 text-gray-300 dark:text-gray-300 light:text-gray-600 px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap hover:bg-white/10 light:hover:bg-gray-200">School</button>
+                        <button class="bg-white/5 dark:bg-white/5 light:bg-gray-100 border border-white/10 dark:border-white/10 light:border-gray-300 text-gray-300 dark:text-gray-300 light:text-gray-600 px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap hover:bg-white/10 light:hover:bg-gray-200">Life</button>
+                        <button class="bg-white/5 dark:bg-white/5 light:bg-gray-100 border border-white/10 dark:border-white/10 light:border-gray-300 text-gray-300 dark:text-gray-300 light:text-gray-600 px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap hover:bg-white/10 light:hover:bg-gray-200">Applications</button>
+                    </div>
+
+                    <div class="space-y-4">
+                        <p class="text-xs text-gray-500 font-bold tracking-widest uppercase">To Do (${active.length})</p>
+                        ${active.map(task => renderTaskItem(task)).join('')}
+                        ${active.length === 0 ? '<div class="text-center py-10 text-gray-600 dark:text-gray-600 light:text-gray-400">No active tasks. <br> Time to relax or add more.</div>' : ''}
+                    </div>
+
+                    <div class="mt-8 space-y-4 opacity-70">
+                         <div class="flex items-center gap-2 cursor-pointer text-gray-400 dark:text-gray-400 light:text-gray-600 hover:opacity-100" onclick="document.getElementById('completed-list').classList.toggle('hidden')">
+                             <i class="fa-solid fa-chevron-down text-xs"></i>
+                             <p class="text-xs font-bold tracking-widest uppercase">Completed (${completed.length})</p>
+                         </div>
+                         <div id="completed-list" class="space-y-2 hidden">
+                             ${completed.map(task => renderTaskItem(task)).join('')}
+                         </div>
                     </div>
                 </div>
             `;
         }
 
+        function renderTaskItem(task) {
+            return `
+                <div class="glass p-4 rounded-xl flex items-start gap-4 group ${task.completed ? 'opacity-50' : ''} light:bg-white/90 light:border-gray-200">
+                    <button onclick="toggleTask(${task.id})" class="mt-1 w-5 h-5 flex-shrink-0 rounded-full border ${task.completed ? 'bg-brand-success border-brand-success' : 'border-gray-500 dark:border-gray-500 light:border-gray-400 hover:border-brand-accent'} flex items-center justify-center transition">
+                         ${task.completed ? '<i class="fa-solid fa-check text-black text-xs"></i>' : ''}
+                    </button>
+                    <div class="flex-1">
+                        <div class="flex justify-between items-start">
+                             <p class="font-semibold text-sm ${task.completed ? 'line-through text-gray-500 dark:text-gray-500 light:text-gray-400' : 'text-white dark:text-white light:text-gray-900'}">${task.title}</p>
+                             <button onclick="deleteTask(${task.id})" class="text-gray-600 hover:text-red-500 transition"><i class="fa-solid fa-trash text-xs"></i></button>
+                        </div>
+                        <div class="flex gap-2 text-xs text-gray-500 dark:text-gray-500 light:text-gray-600 mt-1 items-center">
+                            <span class="${getCategoryColor(task.category)} border border-white/5 dark:border-white/5 light:border-gray-200 px-1.5 py-0.5 rounded">${task.category}</span>
+                            ${task.date ? `<span><i class="fa-regular fa-clock mr-1"></i>${formatDate(task.date)}</span>` : ''}
+                            ${task.priority === 'Critical' ? '<span class="text-red-400 font-bold">!!!</span>' : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
         let focusTimer = null;
         let focusTimeLeft = 25 * 60;
         let isFocusing = false;
@@ -789,21 +823,21 @@
                     <div class="text-center z-10">
                         <div class="mb-8">
                             <h2 class="text-4xl font-bold mb-2">Focus Mode</h2>
-                            <p class="text-gray-400">Lock In. Distractions Out.</p>
+                            <p class="text-gray-400 dark:text-gray-400 light:text-gray-600">Lock In. Distractions Out.</p>
                         </div>
 
                         <!-- Timer Display -->
                         <div class="relative w-64 h-64 mx-auto mb-8 flex items-center justify-center">
                             <svg class="absolute inset-0 w-full h-full transform -rotate-90">
-                                <circle cx="128" cy="128" r="120" stroke="rgba(255,255,255,0.1)" stroke-width="8" fill="transparent"/>
-                                <circle id="timer-ring" cx="128" cy="128" r="120" stroke="var(--brand-accent)" stroke-width="8" fill="transparent" stroke-dasharray="754" stroke-dashoffset="0" stroke-linecap="round" class="timer-circle"/>
+                                <circle cx="128" cy="128" r="120" stroke="rgba(255,255,255,0.1)" stroke-width="8" fill="transparent" class="dark:stroke-white/10 light:stroke-gray-300"/>
+                                <circle id="timer-ring" cx="128" cy="128" r="120" stroke="#8b5cf6" stroke-width="8" fill="transparent" stroke-dasharray="754" stroke-dashoffset="0" stroke-linecap="round" class="timer-circle"/>
                             </svg>
-                            <div class="text-6xl font-mono font-bold tracking-tighter" id="timer-display">25:00</div>
+                            <div class="text-6xl font-mono font-bold tracking-tighter text-white dark:text-white light:text-gray-900" id="timer-display">25:00</div>
                         </div>
 
                         <!-- Task Selection -->
                         <div class="mb-8 max-w-xs mx-auto">
-                            <select id="focus-task-select" class="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-sm text-center focus:outline-none">
+                            <select id="focus-task-select" class="w-full bg-white/5 border border-white/10 dark:bg-white/5 dark:border-white/10 light:bg-gray-100 light:border-gray-300 rounded-lg p-2 text-sm text-center focus:outline-none text-white dark:text-white light:text-gray-900">
                                 <option value="">-- Select a task to lock in on --</option>
                                 ${store.tasks.filter(t => !t.completed).map(t => `<option value="${t.id}">${t.title}</option>`).join('')}
                             </select>
@@ -811,19 +845,18 @@
 
                         <!-- Controls -->
                         <div class="flex gap-4 justify-center">
-                            <button onclick="toggleTimer()" id="timer-btn" class="w-16 h-16 rounded-full bg-white text-black flex items-center justify-center text-xl hover:scale-105 transition shadow-[0_0_20px_rgba(255,255,255,0.3)]">
+                            <button onclick="toggleTimer()" id="timer-btn" class="w-16 h-16 rounded-full bg-brand-accent text-white flex items-center justify-center text-xl hover:scale-105 transition shadow-lg shadow-brand-accent/30">
                                 <i class="fa-solid fa-play ml-1"></i>
                             </button>
-                            <button onclick="resetTimer()" class="w-16 h-16 rounded-full bg-white/10 text-white flex items-center justify-center text-xl hover:bg-white/20 transition">
+                            <button onclick="resetTimer()" class="w-16 h-16 rounded-full bg-white/10 dark:bg-white/10 light:bg-gray-200 text-white dark:text-white light:text-gray-900 flex items-center justify-center text-xl hover:bg-white/20 light:hover:bg-gray-300 transition">
                                 <i class="fa-solid fa-rotate-right"></i>
                             </button>
                         </div>
                     </div>
                 </div>
             `;
+             updateTimerDisplay(); // Ensure the display is accurate when loading the view
         }
-
-        // --- ACTIONS & LOGIC ---
 
         function toggleTimer() {
             const btn = document.getElementById('timer-btn');
@@ -840,7 +873,7 @@
                 if(focusTimeLeft <= 0) focusTimeLeft = 25 * 60;
                 isFocusing = true;
                 btn.innerHTML = '<i class="fa-solid fa-pause"></i>';
-                ring.style.stroke = "var(--brand-accent)";
+                ring.style.stroke = "#8b5cf6";
 
                 focusTimer = setInterval(() => {
                     focusTimeLeft--;
@@ -851,9 +884,10 @@
                         isFocusing = false;
                         btn.innerHTML = '<i class="fa-solid fa-check"></i>';
                         store.focusLog += 25; // Add to stats
-                        addXP(100); // XP Reward
                         saveData();
-                        alert("Session Complete! +100 XP");
+                        showMessage("Session Complete!", "Great job! Take a well-deserved break.", "success");
+                        // Reset for next session
+                        resetTimer();
                     }
                 }, 1000);
             }
@@ -865,29 +899,138 @@
             focusTimeLeft = 25 * 60;
             updateTimerDisplay();
             document.getElementById('timer-btn').innerHTML = '<i class="fa-solid fa-play ml-1"></i>';
-            document.getElementById('timer-ring').style.strokeDashoffset = 0;
+            document.getElementById('timer-ring').style.strokeDashoffset = 754; // Reset offset to full circle
         }
 
         function updateTimerDisplay() {
             const m = Math.floor(focusTimeLeft / 60);
             const s = focusTimeLeft % 60;
-            document.getElementById('timer-display').textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+            const display = document.getElementById('timer-display');
+            if(display) display.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
             
-            // Update Ring
+            // Update Ring (Circumference 2 * PI * 120 = 753.98 ~ 754)
             const totalTime = 25 * 60;
             const progress = focusTimeLeft / totalTime;
             const dashoffset = 754 * (1 - progress);
-            document.getElementById('timer-ring').style.strokeDashoffset = dashoffset;
+            const ring = document.getElementById('timer-ring');
+            if(ring) ring.style.strokeDashoffset = dashoffset;
         }
 
-        // Form Handling
+        function renderSettings(container) {
+            container.innerHTML = `
+                <div class="max-w-4xl mx-auto p-6 animate-enter pb-24">
+                    <h2 class="text-2xl font-bold mb-8">Settings & Configuration</h2>
+                    
+                    <!-- Theme Settings -->
+                    <div class="glass p-6 rounded-2xl mb-8 light:bg-white/90 light:border-gray-200">
+                        <h3 class="font-bold text-lg mb-4">Appearance</h3>
+                        <p class="text-sm text-gray-500 mb-4">Choose your preferred theme.</p>
+                        <div class="flex gap-4">
+                            <button onclick="setTheme('dark')" class="px-4 py-2 rounded-lg font-semibold border ${store.theme === 'dark' ? 'bg-brand-accent text-white border-brand-accent' : 'bg-white/5 dark:bg-white/5 light:bg-gray-100 dark:border-white/10 light:border-gray-300 dark:text-white light:text-gray-800'}">
+                                <i class="fa-solid fa-moon mr-2"></i> Dark Mode
+                            </button>
+                            <button onclick="setTheme('light')" class="px-4 py-2 rounded-lg font-semibold border ${store.theme === 'light' ? 'bg-brand-accent text-white border-brand-accent' : 'bg-white/5 dark:bg-white/5 light:bg-gray-100 dark:border-white/10 light:border-gray-300 dark:text-white light:text-gray-800'}">
+                                <i class="fa-solid fa-sun mr-2"></i> Light Mode
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Schedule Configuration -->
+                    <div class="glass p-6 rounded-2xl mb-8 light:bg-white/90 light:border-gray-200">
+                        <h3 class="font-bold text-lg mb-4">Schedule Setup (Day ${store.schedule.dayType})</h3>
+                        <p class="text-sm text-gray-500 mb-4">Configure your rotating class schedule.</p>
+                        
+                        <div class="mb-4">
+                            <label class="block text-sm font-semibold mb-2">Current Rotating Day</label>
+                            <select id="schedule-day-type" class="w-40 bg-white/5 border border-white/10 dark:bg-white/5 dark:border-white/10 light:bg-gray-100 light:border-gray-300 rounded-lg p-2 text-sm text-white dark:text-white light:text-gray-900" onchange="updateScheduleDay(this.value)">
+                                <option value="A" ${store.schedule.dayType === 'A' ? 'selected' : ''}>A Day</option>
+                                <option value="B" ${store.schedule.dayType === 'B' ? 'selected' : ''}>B Day</option>
+                            </select>
+                        </div>
+
+                        <div id="class-list-container" class="space-y-3">
+                            <p class="text-xs text-gray-500 mb-2 uppercase">Defined Classes</p>
+                            ${store.schedule.classes.map(cls => `
+                                <div class="flex items-center gap-3 p-2 rounded-lg border border-white/10 dark:border-white/10 light:border-gray-200" style="border-left: 4px solid ${getClassColorHex(cls.color)};">
+                                    <span class="text-sm font-semibold flex-1">${cls.name}</span>
+                                    <span class="text-xs text-gray-500">Blocks: ${cls.blocks.join(', ')}</span>
+                                    <button onclick="removeClass(${cls.id})" class="text-red-500/70 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button onclick="addClassForm()" class="mt-4 w-full py-2 bg-brand-accent/20 text-brand-accent rounded-lg text-sm font-semibold hover:bg-brand-accent/30 transition">Add New Class</button>
+                    </div>
+
+                    <!-- Reset Data -->
+                     <div class="glass p-6 rounded-2xl light:bg-white/90 light:border-gray-200">
+                         <h3 class="font-bold text-lg mb-4 text-red-500">Danger Zone</h3>
+                         <p class="text-sm text-gray-500 mb-4">Clicking this will erase all stored data and restart the application.</p>
+                         <button onclick="clearData()" class="px-4 py-2 rounded-lg font-semibold border border-red-500/50 bg-red-500/10 text-red-400 hover:bg-red-500/20 transition">
+                            <i class="fa-solid fa-skull-crossbones mr-2"></i> Reset All Application Data
+                         </button>
+                     </div>
+                </div>
+            `;
+        }
+        
+        // Settings Actions
+        function updateScheduleDay(value) {
+            store.schedule.dayType = value;
+            saveData();
+            router('settings'); // Re-render settings to show new day type
+        }
+
+        function addClassForm() {
+            // Simple prompt for the sake of single-file structure and speed
+            const name = prompt("Enter Class Name (e.g., AP Calculus):");
+            if (!name) return;
+            const blocks = prompt("Enter Class Blocks (e.g., A1, B2, separate by comma):");
+            if (!blocks) return;
+            const color = prompt("Enter Class Color (e.g., blue, red, yellow):");
+            if (!color) return;
+
+            const newClass = {
+                id: Date.now(),
+                name,
+                color,
+                blocks: blocks.split(',').map(b => b.trim().toUpperCase())
+            };
+            store.schedule.classes.push(newClass);
+            saveData();
+            router('settings');
+            showMessage("Class Added!", `${name} is now on your schedule.`, "success");
+        }
+
+        function removeClass(id) {
+            store.schedule.classes = store.schedule.classes.filter(cls => cls.id !== id);
+            saveData();
+            router('settings');
+            showMessage("Class Removed", "The class has been deleted.", "warning");
+        }
+
+        // --- FOCUS LOGIC ---
+        // (Focus Logic is defined above but remains in place)
+
+        // --- Form Handling ---
         document.getElementById('onboarding-form').addEventListener('submit', (e) => {
             e.preventDefault();
             const name = document.getElementById('ob-name').value;
             const grade = document.getElementById('ob-grade').value;
-            const goal = document.getElementById('ob-goal').value;
+            const scheduleType = document.getElementById('ob-schedule-type').value;
 
-            store.user = { name, grade, goal, classes: [] };
+            store.user = { name, grade, scheduleType };
+            store.schedule.dayType = scheduleType === 'AB' ? 'A' : 'Static';
+            
+            // Set initial block map for AB if chosen
+            if (scheduleType === 'AB') {
+                 store.schedule.blockMap = {
+                    'A1': { start: '08:30', end: '09:45' },
+                    'A2': { start: '11:10', end: '12:25' },
+                    'B1': { start: '09:50', end: '11:05' },
+                    'B2': { start: '13:00', end: '14:15' },
+                };
+            }
+            
             saveData();
             document.getElementById('onboarding-modal').classList.add('hidden');
             updateSidebar();
@@ -904,9 +1047,11 @@
         function closeAddModal() {
             document.getElementById('add-modal').classList.add('hidden');
             document.getElementById('add-form').reset();
+            // Clear priority visualization
         }
 
         function switchAddTab(type) {
+            // Tab switching logic (left as is)
             const taskTab = document.getElementById('tab-task');
             const eventTab = document.getElementById('tab-event');
             const timeInput = document.getElementById('time-input-container');
@@ -915,17 +1060,17 @@
 
             if(type === 'task') {
                 taskTab.classList.add('text-brand-accent', 'border-brand-accent');
-                taskTab.classList.remove('text-gray-400');
+                taskTab.classList.remove('text-gray-400', 'border-transparent');
                 eventTab.classList.remove('text-brand-accent', 'border-brand-accent');
-                eventTab.classList.add('text-gray-400');
+                eventTab.classList.add('text-gray-400', 'border-transparent');
                 timeInput.classList.add('hidden');
                 actionText.textContent = "Task";
                 typeInput.value = "task";
             } else {
                 eventTab.classList.add('text-brand-accent', 'border-brand-accent');
-                eventTab.classList.remove('text-gray-400');
+                eventTab.classList.remove('text-gray-400', 'border-transparent');
                 taskTab.classList.remove('text-brand-accent', 'border-brand-accent');
-                taskTab.classList.add('text-gray-400');
+                taskTab.classList.add('text-gray-400', 'border-transparent');
                 timeInput.classList.remove('hidden');
                 actionText.textContent = "Event";
                 typeInput.value = "event";
@@ -950,17 +1095,18 @@
                     completed: false
                 };
                 store.tasks.push(newTask);
-                addXP(10); // Creating task reward
+                showMessage("Task Added!", `"${title}" due on ${formatDate(date)}`, "success");
             } else {
                 const time = document.getElementById('add-time').value;
                 const newEvent = {
                     id: Date.now(),
                     title,
-                    type: category, // reusing category logic as type
+                    type: category, // reusing category logic as event type
                     date,
                     time
                 };
                 store.events.push(newEvent);
+                showMessage("Event Added!", `"${title}" scheduled for ${time}`, "success");
             }
 
             saveData();
@@ -972,7 +1118,7 @@
 
         function setPriority(p) {
             document.getElementById('add-priority').value = p;
-            alert(`Priority set to ${p}`);
+            showMessage("Priority Set", `New item is ${p} priority.`, "warning");
         }
 
         // Data Manipulation
@@ -980,10 +1126,13 @@
             const task = store.tasks.find(t => t.id === id);
             if (task) {
                 task.completed = !task.completed;
-                if(task.completed) addXP(50); // Completion reward
                 saveData();
                 const activeBtn = document.querySelector('.nav-btn.active');
                 if(activeBtn) router(activeBtn.dataset.target);
+                
+                if (task.completed) {
+                    showMessage("Task Complete!", `Nice work on "${task.title}".`, "success");
+                }
             }
         }
 
@@ -992,16 +1141,38 @@
             saveData();
             const activeBtn = document.querySelector('.nav-btn.active');
             if(activeBtn) router(activeBtn.dataset.target);
+            showMessage("Task Deleted", "It's gone forever.", "danger");
         }
 
         function toggleHabit(id) {
             const habit = store.habits.find(h => h.id === id);
             if(habit) {
                 habit.completedToday = !habit.completedToday;
-                if(habit.completedToday) addXP(20);
                 saveData();
                 renderDashboard(document.getElementById('main-container')); // Re-render only dashboard
             }
+        }
+        
+        // Custom Message/Toast Logic (Replaces alert())
+        function showMessage(title, message, type) {
+            // A simple placeholder for a toast notification system
+            const color = type === 'success' ? 'bg-brand-success' : type === 'warning' ? 'bg-brand-warning' : 'bg-brand-danger';
+            
+            const toast = document.createElement('div');
+            toast.className = `fixed bottom-24 md:bottom-8 right-4 z-[70] p-4 rounded-xl text-white ${color} shadow-lg animate-enter`;
+            toast.innerHTML = `
+                <p class="font-bold text-sm">${title}</p>
+                <p class="text-xs">${message}</p>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.remove('animate-enter');
+                toast.style.opacity = 0;
+                toast.style.transition = 'opacity 0.5s ease-out';
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
         }
 
         // Helpers
@@ -1014,9 +1185,20 @@
                 default: return 'text-gray-400';
             }
         }
+        
+        function getClassColorHex(colorName) {
+            switch(colorName.toLowerCase()) {
+                case 'blue': return '#3b82f6';
+                case 'red': return '#ef4444';
+                case 'yellow': return '#f59e0b';
+                case 'green': return '#10b981';
+                case 'purple': return '#a855f7';
+                default: return '#6b7280'; // gray
+            }
+        }
 
         function formatDate(dateStr) {
-            const d = new Date(dateStr);
+            const d = new Date(dateStr + 'T00:00:00'); // Adding T00:00:00 to prevent timezone issues
             return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
         }
 
