@@ -184,6 +184,33 @@
             pointer-events: none;
             display: none;
         }
+        
+        /* Task Filter Buttons */
+        .task-filter-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            background-color: #e5e7eb; /* brand-lightInput */
+            transition: all 0.2s ease;
+        }
+        .task-filter-btn:hover {
+            background-color: #f3f4f6; /* brand-lightCardHover */
+        }
+        .task-filter-btn.active {
+            background-color: #8b5cf6; /* brand-accent */
+            color: white;
+        }
+        
+        html.dark .task-filter-btn {
+            background-color: #27272a; /* brand-input */
+        }
+        html.dark .task-filter-btn:hover {
+            background-color: #202023; /* brand-cardHover */
+        }
+        html.dark .task-filter-btn.active {
+            background-color: #8b5cf6; /* brand-accent */
+            color: white;
+        }
     </style>
 </head>
 <body class="bg-brand-light dark:bg-brand-dark text-gray-800 dark:text-gray-200 font-sans antialiased">
@@ -918,7 +945,8 @@
                 gamification: {
                     xp: 0,
                     level: 1,
-                    xpToNextLevel: 100,
+                    xpToNextLevel: 10000,
+                    lastLoginDate: null, // YYYY-MM-DD
                 },
             }),
 
@@ -931,6 +959,7 @@
                 app.cacheDomElements();
                 app.loadState();
                 app.applyTheme();
+                app.checkDailyLoginXP(); // Check for daily login XP
                 app.registerEventListeners();
 
                 if (!app.state.onboardingComplete) {
@@ -2369,14 +2398,13 @@
                 const { xp, level, xpToNextLevel } = app.state.gamification;
                 app.state.gamification.level++;
                 app.state.gamification.xp = xp - xpToNextLevel; // Carry over remaining XP
-                app.state.gamification.xpToNextLevel = Math.floor(xpToNextLevel * 1.2); // Increase XP gap by 20%
+                app.state.gamification.xpToNextLevel = 10000; // Fixed 10,000 XP per level
                 
                 app.showToast(`Level Up! You are now Level ${app.state.gamification.level}!`, 'success', 5000);
             },
 
             deLevel: () => {
-                // Set new "max" XP for the (now) previous level
-                const prevXpToNextLevel = Math.floor(app.state.gamification.xpToNextLevel / 1.2); // Reverse the 20% increase
+                const prevXpToNextLevel = 10000; // Fixed 10,000 XP
                 app.state.gamification.level--;
                 app.state.gamification.xpToNextLevel = prevXpToNextLevel;
                 app.state.gamification.xp = prevXpToNextLevel + app.state.gamification.xp; // Add the negative XP to the new max
@@ -2972,6 +3000,24 @@
         // == APP START ====================================================================
         // =================================================================================
         
+        // Add daily login check function
+        app.checkDailyLoginXP = () => {
+            const todayStr = app.helpers.formatDateToYYYYMMDD(new Date());
+            if (app.state.gamification.lastLoginDate !== todayStr) {
+                app.state.gamification.lastLoginDate = todayStr;
+                // Only add XP if it's not the very first login (i.e., lastLoginDate was not null)
+                if (app.state.gamification.lastLoginDate !== null && app.state.onboardingComplete) {
+                     // Check if it's not the first session
+                    const lastLogin = localStorage.getItem('lockinAppState'); // Check if state was saved before
+                    if(lastLogin) {
+                        app.addXP(20);
+                        app.showToast('Daily Login! +20 XP', 'info');
+                    }
+                }
+                app.saveState(); // Save the new login date
+            }
+        };
+
         window.onload = app.init;
 
     </script>
